@@ -18,8 +18,9 @@ namespace api.Mappers
                   Title = ImageModel.Title,
                   Description = ImageModel.Description,
                   CreatedDate = ImageModel.CreatedDate,
+                  
 
-                  comments = ImageModel.Comments.Select(c => c.ToCommentDto()).ToList()
+                  Comments = ImageModel.Comments.Select(c => c.ToCommentDto()).ToList()
 
             };
         }

@@ -8,13 +8,16 @@ namespace api.Dtos.Image
 {
     public class CreateImageRequestDto
     {
-         public int ImageId { get; set; }
+
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
 
        // public List<CommentDto> Comments (get; set;)
-
+        public string ImageURL {get; set;}
         public DateTime CreatedDate { get; set; }
-        public int UserId { get; set; }
+
+         
+
+        public string UserId { get; set; }
     }
 }

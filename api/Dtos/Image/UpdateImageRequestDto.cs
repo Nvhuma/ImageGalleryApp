@@ -8,6 +8,12 @@ namespace api.Dtos.Image
 {
     public class UpdateImageRequestDto
     {
+         public int ImageId { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string ImageURL {get; set;}
+        public DateTime CreatedDate { get; set; }
+     
     }
     
 }

@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using api.Mappers;
 using api.Dtos.ImageTag;
 using api.Interfaces;
+using api.Helpers;
 
 
 
@@ -29,9 +30,12 @@ namespace api.Controllers
 
         // GET: api/ImageTag
         [HttpGet]
-        public  async Task<IActionResult> GetAll()
+        public  async Task<IActionResult> GetAll( [FromQuery]  QueryObject query )
         {
-           var imageTags = await _imageTagRepo.GetAllAsync();
+            if(!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+           var imageTags = await _imageTagRepo.GetAllAsync(query);
 
            var ImageTagDto = imageTags.Select(it => it.ToImageTagDto());
 
@@ -40,10 +44,13 @@ namespace api.Controllers
 
 
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
 
         public async Task<IActionResult> GetById([FromRoute]int id)
         {
+            if(!ModelState.IsValid)
+            return BadRequest(ModelState);
+
             var  imageTags =  await _imageTagRepo.GetByIdAsync(id);
 
             if(imageTags == null)
@@ -54,8 +61,12 @@ namespace api.Controllers
         }
 
         [HttpPost]
+        [Route("{id:int}")]
         public async Task<IActionResult> Create([FromBody] CreateImageTagRequestDto imageTagDto)
         {
+             if(!ModelState.IsValid)
+            return BadRequest(ModelState);
+
             var imageTagModel = imageTagDto.ToImageTagFromCreateDTO();
            await _imageTagRepo.CreateAsync(imageTagModel);
 
@@ -64,9 +75,12 @@ namespace api.Controllers
         
 
         [HttpPut]
-        [Route("{id}")]
+        [Route("{id:int}")]
         public async Task< IActionResult>  Update([FromRoute] int id, [FromBody] UpdateImageTagRequestDto updateDto)
         {
+            if(!ModelState.IsValid)
+            return BadRequest(ModelState);
+
             var imageTagModel = await  _imageTagRepo.UpdateAsync(id, updateDto);
 
             if (imageTagModel == null)
@@ -79,9 +93,12 @@ namespace api.Controllers
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("{id:int}")]
         public  async Task<IActionResult> Delete([FromRoute] int id)
         {
+            if(!ModelState.IsValid)
+            return BadRequest(ModelState);
+
             var imageTagModel = await _imageTagRepo.DeleteAsync(id);
 
             if (imageTagModel == null)
