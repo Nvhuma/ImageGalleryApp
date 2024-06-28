@@ -62,10 +62,7 @@ namespace api.Controllers
                 return BadRequest("comment does not exist");
              }
 
-            // if (!await _commentRepo.ImageExist(UserID))
-            // {
-            //     return BadRequest("comment does not exist");
-            // }
+            
 
             var commentModel = commentDto.ToCommentFromCreate(ImageId, UserID);
              await _commentRepo.CreateAysnc(commentModel);

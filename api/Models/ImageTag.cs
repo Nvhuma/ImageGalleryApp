@@ -9,6 +9,7 @@ namespace api.Models
      [Table("ImageTags")]
     public class ImageTag
     {
+         public int ImageTagID { get; set; }
         public int ImageId { get; set; }
         public int TagId { get; set; }
 

@@ -44,14 +44,15 @@ namespace api.Controllers
 
 
 
-        [HttpGet("{id:int}")]
+        [HttpGet]
+        [Route("{ImageTagId:int}")]
 
-        public async Task<IActionResult> GetById([FromRoute]int id)
+        public async Task<IActionResult> GetById([FromRoute] int ImageTagID)
         {
             if(!ModelState.IsValid)
             return BadRequest(ModelState);
 
-            var  imageTags =  await _imageTagRepo.GetByIdAsync(id);
+            var  imageTags =  await _imageTagRepo.GetByIdAsync(ImageTagID);
 
             if(imageTags == null)
             {
@@ -61,8 +62,8 @@ namespace api.Controllers
         }
 
         [HttpPost]
-        [Route("{id:int}")]
-        public async Task<IActionResult> Create([FromBody] CreateImageTagRequestDto imageTagDto)
+        [Route("{Id}")]
+        public async Task<IActionResult> Create(int ImageTagId, [FromBody] CreateImageTagRequestDto imageTagDto)
         {
              if(!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -70,18 +71,18 @@ namespace api.Controllers
             var imageTagModel = imageTagDto.ToImageTagFromCreateDTO();
            await _imageTagRepo.CreateAsync(imageTagModel);
 
-            return CreatedAtAction(nameof(GetById), new { id = imageTagModel.ImageId }, imageTagModel.ToImageTagDto());
+            return CreatedAtAction(nameof(GetById), new { id = imageTagModel.ImageTagID }, imageTagModel.ToImageTagDto());
         }
         
 
         [HttpPut]
         [Route("{id:int}")]
-        public async Task< IActionResult>  Update([FromRoute] int id, [FromBody] UpdateImageTagRequestDto updateDto)
+        public async Task< IActionResult>  Update([FromRoute] int ImageTagId, [FromBody] UpdateImageTagRequestDto updateDto)
         {
             if(!ModelState.IsValid)
             return BadRequest(ModelState);
 
-            var imageTagModel = await  _imageTagRepo.UpdateAsync(id, updateDto);
+            var imageTagModel = await  _imageTagRepo.UpdateAsync(ImageTagId, updateDto);
 
             if (imageTagModel == null)
             {

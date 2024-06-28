@@ -8,10 +8,14 @@ namespace api.Dtos.ImageTag
 {
     public class CreateImageTagRequestDto
     {
+        
          [Required]
           public int ImageId { get; set; }
 
           [Required]
           public int TagId { get; set; }
+          
+          [Required]
+          public int ImageTagID {get; set;}
     }
 }

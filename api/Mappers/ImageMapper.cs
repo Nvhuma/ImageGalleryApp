@@ -33,6 +33,7 @@ namespace api.Mappers
                   Title = imageDto.Title,
                   Description = imageDto.Description,
                   CreatedDate = imageDto.CreatedDate,
+                   ImageURL = imageDto.ImageURL
             };
         }
     }

@@ -14,6 +14,7 @@ namespace api.Mappers
         {
             return new ImageTagDto
             {
+              ImageTagID = imageTagModel.ImageTagID,
               ImageId = imageTagModel.ImageId,
               TagId = imageTagModel.TagId,
             };
@@ -23,6 +24,7 @@ namespace api.Mappers
         {
             return new ImageTag
             {
+                ImageTagID = imageTagDto.ImageTagID,
                  TagId = imageTagDto.TagId,
                  ImageId = imageTagDto.ImageId,
             };

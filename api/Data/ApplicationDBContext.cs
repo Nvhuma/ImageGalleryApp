@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,7 +24,22 @@ namespace api.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-           base.OnModelCreating(modelBuilder);
+           base.OnModelCreating(modelBuilder );
+           List<IdentityRole> roles = new List<IdentityRole>
+           {
+             new IdentityRole
+             {
+                Name = "Admin",
+                NormalizedName = "Admin"
+             },
+              new IdentityRole
+             {
+                Name = "User",
+                NormalizedName = "User"
+             },
+           };
+           //seed roles 
+           modelBuilder.Entity<IdentityRole>().HasData(roles);
 
         // Fluent API configurations
          modelBuilder.Entity<AppUser>()
@@ -46,19 +62,21 @@ namespace api.Data
             .HasForeignKey(c => c.ImageId);
 
         modelBuilder.Entity<ImageTag>()
-            .HasKey(it => new { it.ImageId, it.TagId });
+                .HasKey(it => it.ImageTagID);
 
-        modelBuilder.Entity<ImageTag>()
-            .HasOne(it => it.Image)
-            .WithMany(i => i.ImageTags)
-            .HasForeignKey(it => it.ImageId);
+            modelBuilder.Entity<ImageTag>()
+                .Property(it => it.ImageTagID)
+                .ValueGeneratedOnAdd();
 
-        modelBuilder.Entity<ImageTag>()
-            .HasOne(it => it.Tag)
-            .WithMany(t => t.ImageTags)
-            .HasForeignKey(it => it.TagId);
+            modelBuilder.Entity<ImageTag>()
+                .HasOne(it => it.Image)
+                .WithMany(i => i.ImageTags)
+                .HasForeignKey(it => it.ImageId);
 
-           
+             modelBuilder.Entity<ImageTag>()
+                .HasOne(it => it.Tag)
+                .WithMany(t => t.ImageTags)
+                .HasForeignKey(it => it.TagId);   
         }
     }
 }

@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using api.Data;
 using api.Dtos.Image;
+using api.Helpers;
 using api.Interfaces;
 using api.Mappers;
+using api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,16 +26,16 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
         {
-            var images = await _imageRepo.GetAllAsync();
+            var images = await _imageRepo.GetAllAsync(query);
 
             var imageDto = images.Select( s => s.ToImageDto());
 
             return Ok(images);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById([FromRoute]int id)
         {
             var images = await _imageRepo.GetByIdAsync(id);
@@ -50,15 +52,23 @@ namespace api.Controllers
         public  async Task<IActionResult> Create([FromForm]  CreateImageRequestDto  ImageDto)
         {
             var ImageModel = ImageDto.ToImageFromCreateDTO();
+            var imageModel = new Image
+           {
+                    Title = ImageDto.Title,
+                    Description = ImageDto.Description,
+                    CreatedDate = DateTime.UtcNow,
+                    UserId = ImageDto.UserId,
+                    ImageURL = ImageDto.ImageURL // Ensuring that the url this is set
+             };
 
            await _imageRepo.CreateAsync(ImageModel);
 
-            return CreatedAtAction(nameof(GetById), new { ID = ImageModel.ImageId}, ImageModel.ToImageDto());
+            return CreatedAtAction(nameof(GetById), new { Id = ImageModel.ImageId}, ImageModel.ToImageDto());
 
         }
 
         [HttpPut]
-        [Route("{id}")]
+        [Route("{id:int}")]
 
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateImageRequestDto updateDto)
         {
@@ -74,7 +84,7 @@ namespace api.Controllers
         }
     
         [HttpDelete]
-        [Route("{id}")]
+        [Route("{idi:int}")]
 
         public async Task<IActionResult> Delete([FromRoute] int id)
         {

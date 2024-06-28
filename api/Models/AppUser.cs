@@ -8,7 +8,7 @@ namespace api.Models
 {
     public class AppUser : IdentityUser
     {
-        public string Names { get; set;}
+        public string ? Names { get; set;}
 
        // public DateTime CreatedDate {get; set;} = DateTime.Now;
 

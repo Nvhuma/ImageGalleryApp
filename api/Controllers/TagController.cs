@@ -35,7 +35,7 @@ namespace api.Controllers
             return Ok(tag);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async  Task<IActionResult> GetById([FromRoute] int id)
         {
             var tag = await _tagRepo.GetByIdAysnc(id);
@@ -60,7 +60,7 @@ namespace api.Controllers
         }
         
         [HttpPut]
-        [Route("{id}")]
+        [Route("{id:int}")]
 
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateTagRequestDto updateDto)
         {
@@ -77,7 +77,7 @@ namespace api.Controllers
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("{id:int}")]
 
         public  async Task<IActionResult> Delete([FromRoute] int id)
         {
