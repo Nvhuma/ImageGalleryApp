@@ -17,87 +17,83 @@ namespace api.Controllers
     [ApiController]
     public class ImageController : ControllerBase
     {
+        // Dependencies injected through constructor
         private readonly IImageRepository _imageRepo;
         private readonly ApplicationDBContext _context;
+
+        // Constructor
         public ImageController(ApplicationDBContext context, IImageRepository imageRepo)
         {
             _imageRepo = imageRepo;
             _context = context;
         }
 
+        // GET: api/image
+        // Retrieves all images based on query parameters
         [HttpGet]
         public async Task<IActionResult> GetAllAsyn([FromQuery] QueryObject query)
         {
             var images = await _imageRepo.GetAllAsync(query);
-
-            var imageDto = images.Select( s => s.ToImageDto()).ToList();
-
+            var imageDto = images.Select(s => s.ToImageDto()).ToList();
             return Ok(imageDto);
         }
 
+        // GET: api/image/{id}
+        // Retrieves a specific image by ID
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById([FromRoute]int id)
         {
             var images = await _imageRepo.GetByIdAsync(id);
-
             if(images == null)
             {
                 return NotFound();
             }
-           
-           return Ok(images.ToImageDto());
+            return Ok(images.ToImageDto());
         }
-        
+
+        // POST: api/image
+        // Creates a new image
         [HttpPost]
-        public  async Task<IActionResult> Create([FromForm]  CreateImageRequestDto  ImageDto)
+        public async Task<IActionResult> Create([FromForm] CreateImageRequestDto ImageDto)
         {
             var ImageModel = ImageDto.ToImageFromCreateDTO();
             var imageModel = new Image
-           {
-                    Title = ImageDto.Title,
-                    Description = ImageDto.Description,
-                    CreatedDate = DateTime.UtcNow,
-                    UserId = ImageDto.UserId,
-                    ImageURL = ImageDto.ImageURL // Ensuring that the url this is set
-             };
-
-           await _imageRepo.CreateAsync(ImageModel);
-
+            {
+                Title = ImageDto.Title,
+                Description = ImageDto.Description,
+                CreatedDate = DateTime.UtcNow,
+                UserId = ImageDto.UserId,
+                ImageURL = ImageDto.ImageURL // Ensuring that the URL is set
+            };
+            await _imageRepo.CreateAsync(ImageModel);
             return CreatedAtAction(nameof(GetById), new { Id = ImageModel.ImageId}, ImageModel.ToImageDto());
-
         }
 
+        // PUT: api/image/{id}
+        // Updates an existing image
         [HttpPut]
         [Route("{id:int}")]
-
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateImageRequestDto updateDto)
         {
-          var ImageModel =  await _imageRepo.UpdateAsync(id, updateDto);
-
-          if(ImageModel == null)
-          {
-             return NotFound();
-          }
-
-         
-          return Ok(ImageModel.ToImageDto());
-        }
-    
-        [HttpDelete]
-        [Route("{idi:int}")]
-
-        public async Task<IActionResult> Delete([FromRoute] int id)
-        {
-            var ImageModel = await _imageRepo.DeleteAysnc(id);
-
+            var ImageModel = await _imageRepo.UpdateAsync(id, updateDto);
             if(ImageModel == null)
             {
                 return NotFound();
             }
+            return Ok(ImageModel.ToImageDto());
+        }
 
-
-            
-            
+        // DELETE: api/image/{id}
+        // Deletes a specific image
+        [HttpDelete]
+        [Route("{id:int}")]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            var ImageModel = await _imageRepo.DeleteAysnc(id);
+            if(ImageModel == null)
+            {
+                return NotFound();
+            }
             return NoContent();
         }
     }
