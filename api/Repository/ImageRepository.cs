@@ -64,7 +64,7 @@ namespace api.Repository
 
         {
             // Create a queryable list of image tags from the database.
-        var images = _context.Images.AsQueryable();
+        var images = _context.Images.Include(c => c.Comments).ThenInclude(a => a.AppUser).AsQueryable();
 
            // Check if the query's ImageId is not null and not the default value (0).
         if (!IsNullOrDefault(query.ImageId))

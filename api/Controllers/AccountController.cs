@@ -37,7 +37,7 @@ namespace api.Controllers
 
             var result = await _signinmanager.CheckPasswordSignInAsync(user, loginDto.Password, false);
 
-            if (!result.Succeeded) return Unauthorized("USERNAME NOT FOUND AND/OR PASSWORD INCORECT!");
+            if (!result.Succeeded) return Unauthorized("USERNAME NOT FOUND AND/OR PASSWORD INCORRECT!");
 
             return Ok(
             new NewUserDto
@@ -75,7 +75,7 @@ namespace api.Controllers
                             new NewUserDto
                             {
                                 UserName = appUser.UserName,
-                                EmailAddress = appUser.Email,
+                                EmailAddress  = appUser.Email,
                                 token = _tokenService.CreateToken(appUser)
                             }
                         );

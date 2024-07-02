@@ -19,18 +19,19 @@ namespace api.Mappers
                 Content = commentModel.Content,
                 CreatedDate = commentModel.CreatedDate,
                 ImageId = commentModel.ImageId,
-                UserID = commentModel.UserId,
+                //UserID = commentModel.UserId, 
+                CreatedBy = commentModel.AppUser.UserName,
 
              };
         }
 
-        public static Comment ToCommentFromCreate(this CreateCommentDto commentDto, int ImageId, string UserID)
+        public static Comment ToCommentFromCreate(this CreateCommentDto commentDto, int ImageId )
         {
             return new Comment
             {
                   Content = commentDto.Content,
                   ImageId = ImageId,
-                  UserId = UserID,
+                  //UserId = UserID,
             };
         }
 

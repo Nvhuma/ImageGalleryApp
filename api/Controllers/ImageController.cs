@@ -26,13 +26,13 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
+        public async Task<IActionResult> GetAllAsyn([FromQuery] QueryObject query)
         {
             var images = await _imageRepo.GetAllAsync(query);
 
-            var imageDto = images.Select( s => s.ToImageDto());
+            var imageDto = images.Select( s => s.ToImageDto()).ToList();
 
-            return Ok(images);
+            return Ok(imageDto);
         }
 
         [HttpGet("{id:int}")]
