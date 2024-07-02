@@ -13,7 +13,7 @@ namespace api.Dtos.ImageDto.Comments
         public int? ImageId { get; set; }
         public string CreatedBy {get; set;} = string.Empty;
 
-       // public string UserID {get; set;}
+       // public string ? UserID {get; set;}
         public DateTime CreatedDate { get; set; } =   DateTime.Now;
     }
 }

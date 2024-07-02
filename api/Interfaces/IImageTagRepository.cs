@@ -11,7 +11,7 @@ namespace api.Interfaces
     public interface IImageTagRepository
     {
         Task<List<ImageTag>> GetAllAsync(QueryObject query);
-        Task<ImageTag?> GetByIdAsync( int ImageTagID);
+        Task<ImageTag?> GetByIdAsync(int ImageTagID);
         Task<ImageTag> CreateAsync(ImageTag imageTagRepository);
         Task<ImageTag?> UpdateAsync(int id, UpdateImageTagRequestDto ImageTagDto);
         Task<ImageTag?> DeleteAsync(int id);

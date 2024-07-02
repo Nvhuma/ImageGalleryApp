@@ -14,7 +14,7 @@ namespace api.Interfaces
 
         // Retrieves a specific comment by its ID asynchronously
         // Returns null if the comment is not found
-        Task<Comment?> GetByIdAsync(string id);
+        Task<Comment?> GetByIdAsync(int id);
 
         // Creates a new comment asynchronously
         Task<Comment> CreateAysnc(Comment commentModel);

@@ -20,11 +20,11 @@ namespace api.Models
 
         public DateTime LastUpdated { get; set;} =  DateTime.Now;
 
-        public string CreatedBy {get; set;} = string.Empty;
+        public string  CreatedBy {get; set;} = string.Empty;
 
         //nav properties
-       public Image Image { get; set; } // The image the comment is associated with 
+       public Image  Image { get; set; } // The image the comment is associated with 
           
-        public AppUser AppUser { get; set; }
+        public AppUser  AppUser { get; set; }
     }
 }

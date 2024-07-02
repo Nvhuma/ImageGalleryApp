@@ -1,0 +1,61 @@
+.App {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+	background-image: url('/src/assets/image-gallery.jpeg');
+	background-size: cover;
+	background-position: reletive;
+  }
+  
+  .login-container {
+	background-color: white;
+	padding: 2rem;
+	border-radius: 8px;
+	box-shadow: 0 0 10px rgba(0,0,0,0.1);
+	width: 300px;
+  }
+  
+  h1, h2 {
+	text-align: center;
+	color: #333;
+  }
+  
+  .input-group {
+	margin-bottom: 1rem;
+  }
+  
+  label {
+	display: block;
+	margin-bottom: 0.5rem;
+  }
+  
+  input {
+	width: 100%;
+	padding: 0.5rem;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+  }
+  
+  .forgot-password {
+	display: block;
+	text-align: right;
+	margin-bottom: 1rem;
+	color: #0077be;
+	text-decoration: none;
+  }
+  
+  .login-button {
+	width: 100%;
+	padding: 0.75rem;
+	background-color: #0077be;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+  }
+  
+  .register-link {
+	text-align: center;
+	margin-top: 1rem;
+  }

@@ -47,9 +47,16 @@ namespace api.Repository
         }
 
 
-        public async Task<Comment?> GetByIdAsync(string id)
+        // public async Task<Comment?> GetByIdAsync( id)
+        // {
+        //     return await _context.Comments.Include(a => a.AppUser).FirstOrDefaultAsync(c => c.UserId == id);
+        // }
+
+        public async Task<Comment?> GetByIdAsync(int id)
         {
-            return await _context.Comments.Include(a => a.AppUser).FirstOrDefaultAsync(c => c.UserId == id);
+            return await _context.Comments
+       .Include(c => c.AppUser)  // Include the AppUser related to the comment
+       .FirstOrDefaultAsync(c => c.CommentId == id);  // Retrieve comment by its id
         }
 
         public Task<bool> ImageExist(int id)

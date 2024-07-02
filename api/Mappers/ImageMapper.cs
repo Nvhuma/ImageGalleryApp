@@ -9,18 +9,18 @@ namespace api.Mappers
 {
     public static class ImageMappers
     {
-        public static ImageDto ToImageDto( this Image ImageModel)
+        public static ImageDto ToImageDto(this Image ImageModel)
         {
             return new ImageDto
             {
-                  ImageId =ImageModel.ImageId,
-                  UserId = ImageModel.UserId,
-                  Title = ImageModel.Title,
-                  Description = ImageModel.Description,
-                  CreatedDate = ImageModel.CreatedDate,
-                  
+                ImageId = ImageModel.ImageId,
+                UserId = ImageModel.UserId,
+                Title = ImageModel.Title,
+                Description = ImageModel.Description,
+                CreatedDate = ImageModel.CreatedDate,
 
-                  Comments = ImageModel.Comments.Select(c => c.ToCommentDto()).ToList()
+
+                Comments = ImageModel.Comments.Select(c => c.ToCommentDto()).ToList()
 
             };
         }
@@ -29,11 +29,11 @@ namespace api.Mappers
         {
             return new Image
             {
-                   UserId = imageDto.UserId,
-                  Title = imageDto.Title,
-                  Description = imageDto.Description,
-                  CreatedDate = imageDto.CreatedDate,
-                   ImageURL = imageDto.ImageURL
+                UserId = imageDto.UserId,
+                Title = imageDto.Title,
+                Description = imageDto.Description,
+                CreatedDate = imageDto.CreatedDate,
+                ImageURL = imageDto.ImageURL
             };
         }
     }
