@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './Login.css';
+import { Link } from 'react-router-dom';
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -7,7 +8,6 @@ function Login() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    // Add login logic here
     console.log('Login attempted with:', username, password);
   };
 
@@ -40,9 +40,8 @@ function Login() {
           <a href="#" className="forgot-password">Forgot Password?</a>
           <button type="submit" className="login-button">Login</button>
         </form>
-        <p className="register-link">New to this platform? <a href="#">Register Here</a></p>
+        <p className="register-link">New to this platform? <Link to="/register">Register Here</Link></p>
       </div>
-	  
     </div>
   );
 }

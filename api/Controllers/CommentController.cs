@@ -117,13 +117,14 @@ namespace api.Controllers
                 return BadRequest("Image does not exist");
             }
 
-            var username = User.GetUsername();
-            if (string.IsNullOrEmpty(username))
+            var userEmail = User.GetUserEmail();
+            
+            if (string.IsNullOrEmpty(userEmail))
             {
-                return BadRequest("User not authenticated or username claim not found");
+                return BadRequest("User not authenticated or email claim not found");
             }
 
-            var appUser = await _userManager.FindByNameAsync(username);
+            var appUser = await _userManager.FindByEmailAsync(userEmail);
             if (appUser == null)
             {
                 return BadRequest("User not found");
