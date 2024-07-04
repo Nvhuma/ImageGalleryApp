@@ -1,204 +1,134 @@
+/* Register.css */
+
+/* Register container with adjusted left alignment */
 .register-container {
-    display: flex;
-    height: 100vh;
-    font-family: 'Arial', sans-serif;
-}
-
-.form-section {
-    flex: 1;
-    padding: 40px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    background-color: #faf8f9; /* Background color for form section */
-}
-
-.image-section {
-    flex: 1;
-    background-size: cover;
-    background-position: center;
-}
-
-h1 {
-    color: #2c3e50;
-    margin-bottom: 10px;
-    font-size: 24px;
-}
-
-p {
-    color: #7f8c8d;
-    margin-bottom: 30px;
-    font-size: 14px;
-}
-
-.input-group {
-    margin-bottom: 20px;
-}
-
-label {
-    display: block;
-    margin-bottom: 5px;
-    color: #2c3e50;
-    font-weight: bold;
-}
-
-input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #bdc3c7;
-    border-radius: 4px;
-    font-size: 14px;
-    box-sizing: border-box;
-}
-
-.register-button {
-    width: 100%;
-    padding: 10px;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.register-button:hover {
-    background-color: #2980b9;
-}
-
-.social-login {
-    margin-top: 20px;
-    text-align: center;
-}
-
-.google-btn,
-.facebook-btn {
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-    background-color: white;
-    border: 1px solid #bdc3c7;
-    border-radius: 4px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: bold;
-}
-
-.google-btn img,
-.facebook-btn img {
-    margin-right: 10px;
-}
-
-.facebook-btn {
-    background-color: #3b5998;
-    color: white;
-}
-
-.facebook-btn:hover {
-    background-color: #2d4373;
-}
-.register-container {
-    display: flex;
-    height: 100vh;
-    font-family: 'Arial', sans-serif;
-}
-
-.form-section {
-    flex: 1;
-    padding: 40px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    background-color: #f8f9fa; /* Background color for form section */
-}
-
-.image-section {
-    flex: 1;
-    background-size: cover;
-    background-position: center;
-}
-
-h1 {
-    color: #2c3e50;
-    margin-bottom: 10px;
-    font-size: 24px;
-}
-
-p {
-    color: #7f8c8d;
-    margin-bottom: 30px;
-    font-size: 14px;
-}
-
-.input-group {
-    margin-bottom: 20px;
-}
-
-label {
-    display: block;
-    margin-bottom: 5px;
-    color: #2c3e50;
-    font-weight: bold;
-}
-
-input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #bdc3c7;
-    border-radius: 4px;
-    font-size: 14px;
-    box-sizing: border-box;
-}
-
-.register-button {
-    width: 100%;
-    padding: 10px;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.register-button:hover {
-    background-color: #2980b9;
-}
-
-.social-login {
-    margin-top: 20px;
-    text-align: center;
-}
-
-.google-btn,
-.facebook-btn {
-    width: 100%;
-    padding: 1px;
-    margin-top: 1px;
-    background-color: white;
-    border: 1px solid #bdc3c7;
-    border-radius: 4px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: bold;
-}
-
-.google-btn img,
-.facebook-btn img {
-    margin-right: 10px;
-}
-
-.facebook-btn {
-    background-color: #3b5998;
-    color: white;
-}
-
-.facebook-btn:hover {
-    background-color: #2d4373;
-}
+	display: flex;
+	justify-content: flex-start; /* Align content to the left */
+	align-items: center;
+	height: 100vh;
+	background-color: #f8f9fa; /* Light background color */
+	padding: 0 20px; /* Padding around the container */
+	box-sizing: border-box; /* Include padding in the width and height */
+	overflow: hidden; /* Prevent overflow issues */
+	position: relative; /* Required for z-indexing */
+  }
+  
+  /* Form section styling */
+  .form-section {
+	background-color: #fff; /* White background for the form */
+	padding: 40px; /* Space inside the form container */
+	border-radius: 10px; /* Rounded corners */
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Soft shadow */
+	width: 400px; /* Fixed width for the form */
+	margin-right: 40px; /* Space between form and image */
+	box-sizing: border-box; /* Include padding in the width calculation */
+	position: relative; /* Required for z-indexing */
+	z-index: 10; /* Higher z-index to ensure it's on top */
+  }
+  
+  /* Adjusted image section */
+  .image-section {
+	flex: 1; /* Take up remaining space */
+	background-image: url('/mnt/data/rnbbb.png'); /* Path to the image */
+	background-size: cover; /* Cover the entire container */
+	background-position: center; /* Center the image */
+	border-radius: 10px; /* Matching rounded corners */
+	height: 100%; /* Full height */
+	position: relative; /* Required for positioning */
+	z-index: 1; /* Lower z-index to ensure it's behind the form */
+  }
+  
+  
+  /* Typography */
+  h1 {
+	font-size: 24px;
+	color: #333; /* Dark gray color */
+	margin-bottom: 10px;
+  }
+  
+  p {
+	font-size: 14px;
+	color: #666; /* Light gray color */
+	margin-bottom: 20px;
+  }
+  
+  /* Form elements */
+  .input-group {
+	margin-bottom: 20px;
+  }
+  
+  .input-group label {
+	display: block;
+	font-size: 14px;
+	color: #333;
+	margin-bottom: 5px;
+  }
+  
+  .input-group input {
+	width: 100%;
+	padding: 10px;
+	font-size: 14px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	box-sizing: border-box; /* Include padding in the element's total width */
+  }
+  
+  .register-button {
+	width: 100%;
+	padding: 10px;
+	background-color: #007bff; /* Primary blue color */
+	color: #fff;
+	border: none;
+	border-radius: 5px;
+	font-size: 16px;
+	cursor: pointer;
+	transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+  }
+  
+  .register-button:hover {
+	background-color: #0056b3; /* Darker blue on hover */
+  }
+  
+  /* Social login buttons */
+  .social-login {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+  }
+  
+  .social-login button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+	border: 1px solid #ccc; /* Border for social buttons */
+	border-radius: 5px;
+	background-color: #fff;
+	cursor: pointer;
+	transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+  }
+  
+  .social-login button:hover {
+	background-color: #f1f1f1; /* Light gray on hover */
+  }
+  
+  .social-login img {
+	margin-right: 10px; /* Space between icon and text */
+  }
+  
+  /* Link styling */
+  .login-link {
+	margin-top: 20px;
+	text-align: center;
+	font-size: 14px;
+  }
+  
+  .login-link a {
+	color: #007bff;
+	text-decoration: none;
+  }
+  
+  .login-link a:hover {
+	text-decoration: underline;
+  }
+  

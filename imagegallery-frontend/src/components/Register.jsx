@@ -1,3 +1,5 @@
+// Register.js
+
 import React, { useState } from 'react';
 import './Register.css';
 import googleIcon from '/src/assets/icons8.png';
@@ -13,7 +15,11 @@ function Register() {
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
   };
 
   const handleSubmit = (e) => {
@@ -29,19 +35,47 @@ function Register() {
         <form onSubmit={handleSubmit}>
           <div className="input-group">
             <label htmlFor="fullName">Full Name</label>
-            <input type="text" id="fullName" name="fullName" placeholder="Enter Name" onChange={handleChange} />
+            <input 
+              type="text" 
+              id="fullName" 
+              name="fullName" 
+              value={formData.fullName}
+              placeholder="Enter Name" 
+              onChange={handleChange} 
+            />
           </div>
           <div className="input-group">
             <label htmlFor="email">Email Address</label>
-            <input type="email" id="email" name="email" placeholder="Enter Email" onChange={handleChange} />
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              value={formData.email}
+              placeholder="Enter Email" 
+              onChange={handleChange} 
+            />
           </div>
           <div className="input-group">
             <label htmlFor="password">Password</label>
-            <input type="password" id="password" name="password" placeholder="Enter Password" onChange={handleChange} />
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              value={formData.password}
+              placeholder="Enter Password" 
+              onChange={handleChange} 
+            />
           </div>
           <div className="input-group">
             <label htmlFor="confirmPassword">Confirm Password</label>
-            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Enter Password" onChange={handleChange} />
+            <input 
+              type="password" 
+              id="confirmPassword" 
+              name="confirmPassword" 
+              value={formData.confirmPassword}
+              placeholder="Enter Password" 
+              onChange={handleChange} 
+            />
           </div>
           <button type="submit" className="register-button">Register</button>
         </form>
@@ -52,7 +86,6 @@ function Register() {
           <button className="facebook-btn"><img src={facebookIcon} alt="Facebook" /> Sign in with Facebook</button>
         </div>
       </div>
-      <div className="image-section"></div>
     </div>
   );
 }

@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import './Login.css';
-import { Link } from 'react-router-dom';
+import React, { useState } from "react";
+import "./Login.css";
+import { Link } from "react-router-dom";
 
 function Login() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogin = (e) => {
     e.preventDefault();
-    console.log('Login attempted with:', username, password);
+    console.log("Login attempted with:", username, password);
   };
 
   return (
@@ -37,10 +37,16 @@ function Login() {
               placeholder="Enter Password"
             />
           </div>
-          <a href="#" className="forgot-password">Forgot Password?</a>
-          <button type="submit" className="login-button">Login</button>
+          <a href="#" className="forgot-password">
+            Forgot Password?
+          </a>
+          <button type="submit" className="login-button">
+            Login
+          </button>
         </form>
-        <p className="register-link">New to this platform? <Link to="/register">Register Here</Link></p>
+        <p className="register-link">
+          New to this platform? <Link to="/register">Register Here</Link>
+        </p>
       </div>
     </div>
   );
