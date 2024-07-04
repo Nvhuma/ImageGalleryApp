@@ -11,6 +11,7 @@ using api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace api.Controllers
 {
@@ -104,6 +105,41 @@ namespace api.Controllers
         // }
         // POST: api/comment/{ImageId}
         // Creates a new comment for a specific image
+        // [HttpPost("{ImageId:int}")]
+        // public async Task<IActionResult> Create([FromRoute] int ImageId, CreateCommentDto commentDto)
+        // {
+        //     if (!ModelState.IsValid)
+        //     {
+        //         return BadRequest(ModelState);
+        //     }
+
+        //     if (!await _commentRepo.ImageExist(ImageId))
+        //     {
+        //         return BadRequest("Image does not exist");
+        //     }
+
+        //     var userEmail = User.GetUserEmail();
+
+        //     if (string.IsNullOrEmpty(userEmail))
+        //     {
+        //         return BadRequest("User not authenticated or email claim not found");
+        //     }
+
+        //     var appUser = await _userManager.FindByEmailAsync(userEmail);
+
+        //     if (appUser == null)
+        //     {
+        //         return BadRequest("User not found");
+        //     }
+
+        //     var commentModel = commentDto.ToCommentFromCreate(ImageId);
+        //     commentModel.UserId = appUser.Id;
+
+        //     await _commentRepo.CreateAysnc(commentModel);
+
+        //     return CreatedAtAction(nameof(getbyId), new { id = commentModel.CommentId }, commentModel.ToCommentDto());
+        // }
+
         [HttpPost("{ImageId:int}")]
         public async Task<IActionResult> Create([FromRoute] int ImageId, CreateCommentDto commentDto)
         {
@@ -118,13 +154,15 @@ namespace api.Controllers
             }
 
             var userEmail = User.GetUserEmail();
-            
+
             if (string.IsNullOrEmpty(userEmail))
             {
                 return BadRequest("User not authenticated or email claim not found");
             }
 
-            var appUser = await _userManager.FindByEmailAsync(userEmail);
+            // Use FirstOrDefaultAsync to avoid "Sequence contains more than one element" error
+            var appUser = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+
             if (appUser == null)
             {
                 return BadRequest("User not found");
@@ -137,7 +175,6 @@ namespace api.Controllers
 
             return CreatedAtAction(nameof(getbyId), new { id = commentModel.CommentId }, commentModel.ToCommentDto());
         }
-
 
         // PUT: api/comment/{id}
         // Updates an existing comment

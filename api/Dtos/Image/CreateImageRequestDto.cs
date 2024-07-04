@@ -21,12 +21,12 @@ namespace api.Dtos.Image
 
        // public List<CommentDto> Comments (get; set;)
         [Required]
-        public string ImageURL {get; set;}
+        public string ? ImageURL {get; set;}
         [Required]
         public DateTime CreatedDate { get; set; }
 
          
-        [Required]
-        public string UserId { get; set; }
+        //[Required]
+       // public string UserId { get; set; }
     }
 }

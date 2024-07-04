@@ -40,18 +40,28 @@
   margin-bottom: 1rem;
 }
 
-.login-container .input-group {
+.input-group {
+  position: relative;
   margin-bottom: 1rem;
 }
 
-.login-container label {
-  display: block;
-  margin-bottom: 0.5rem;
+.input-icon {
+  display: flex;
+  align-items: center;
+  position: relative;
 }
 
-.login-container input {
+.input-icon i {
+  position: absolute;
+  left: 10px; /* Adjust icon position */
+  padding: 0.75rem;
+  pointer-events: none;
+  color: #888;
+}
+
+.input-icon input {
   width: 100%;
-  padding: 0.75rem; /* Increase padding for better spacing */
+  padding: 0.75rem 0.75rem 0.75rem 2.5rem; /* Ensure enough space for icon */
   border: 1px solid #ddd;
   border-radius: 4px;
   margin-bottom: 1rem; /* Add margin to separate inputs */

@@ -39,13 +39,20 @@ namespace api.Controllers
             var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.UserName.ToLower());
 
             // If user not found, return unauthorized
-            if (user == null) return Unauthorized("Invalid username!");
+          //  if (user == null) return Unauthorized("Invalid username!");
+
+               if (user == null) return Unauthorized("Invalid username!"); // Updated for better clarity
+
 
             // Check the password
             var result = await _signinmanager.CheckPasswordSignInAsync(user, loginDto.Password, false);
 
             // If password check failed, return unauthorized
-            if (!result.Succeeded) return Unauthorized("USERNAME NOT FOUND AND/OR PASSWORD INCORRECT!");
+
+            //if (!result.Succeeded) return Unauthorized("USERNAME NOT FOUND AND/OR PASSWORD INCORRECT!");
+
+            if (!result.Succeeded) return Unauthorized("USERNAME NOT FOUND AND/OR PASSWORD INCORRECT!"); // Updated for better clarity
+
 
             // If login successful, return user details and token
             return Ok(
@@ -53,7 +60,9 @@ namespace api.Controllers
                 {
                     UserName  = user.UserName,
                     EmailAddress = user.Email,
-                    token = _tokenService.CreateToken(user)
+                   // token = _tokenService.CreateToken(user)
+                    token = _tokenService.CreateToken(user) // Changed 'Token' to 'token'
+
                 }
             );
         }

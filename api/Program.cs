@@ -13,10 +13,15 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Cors;
 
+
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// CORS Configuration: Allow requests from the React app
 
 builder.Services.AddCors(options =>
 {
@@ -34,6 +39,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSwaggerGen(option =>
 {
     option.SwaggerDoc("v1", new OpenApiInfo { Title = "ImageGallery API", Version = "v1" });
+
+     // Add JWT security definition in Swagger
     option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -43,6 +50,8 @@ builder.Services.AddSwaggerGen(option =>
         BearerFormat = "JWT",
         Scheme = "Bearer"
     });
+
+    // Apply security to all endpoints in Swagger
     option.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -60,13 +69,16 @@ builder.Services.AddSwaggerGen(option =>
 });
 
 
+// Database Context configuration using SQL Server
 builder.Services.AddControllers().AddNewtonsoftJson(options =>{
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 });
 
+// Identity configuration for AppUser and roles
 builder.Services.AddDbContext<ApplicationDBContext>(options =>{
      options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
 
 builder.Services.AddIdentity<AppUser, IdentityRole>(options => 
 {
@@ -78,6 +90,8 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 })
 .AddEntityFrameworkStores<ApplicationDBContext>();
 
+
+// JWT Authentication configuration
 builder.Services.AddAuthentication(options => {
  options.DefaultAuthenticateScheme =
  options.DefaultChallengeScheme =
@@ -90,7 +104,7 @@ builder.Services.AddAuthentication(options => {
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
-         ValidateIssuer = true,
+        ValidateIssuer = true,
         ValidIssuer = builder.Configuration["JWT:Issuer"],
         ValidateAudience = true,
         ValidAudience = builder.Configuration["JWT:Audience"],
@@ -102,6 +116,7 @@ builder.Services.AddAuthentication(options => {
 });
 
 
+// Registering repositories and services for dependency injection
 builder.Services.AddScoped<IImageTagRepository, ImageTagRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IImageRepository, ImageRepository>();
@@ -118,16 +133,22 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Enable CORS for the specified policy
 app.UseCors("AllowReactApp");
 
+// Redirect HTTP requests to HTTPS
 app.UseHttpsRedirection();
 
+// Use authentication middleware
 app.UseAuthentication();
 
+// Use authorization middleware
 app.UseAuthorization();
 
+// Map controller routes
 app.MapControllers();
 
+// Run the application
 app.Run();
 
 

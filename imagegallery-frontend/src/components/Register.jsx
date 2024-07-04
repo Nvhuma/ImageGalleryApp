@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import './Register.css';
 import googleIcon from '/src/assets/icons8.png';
 import facebookIcon from '/src/assets/icons7.png';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -14,24 +15,28 @@ function Register() {
     confirmPassword: ''
   });
 
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevState => ({
       ...prevState,
       [name]: value
+      
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Form submitted:', formData);
+    navigate('/Login')
   };
 
   return (
     <div className="register-container">
       <div className="form-section">
         <h1>Register Profile</h1>
-        <p>Lorem ipsum dolor sit .</p>
+        <p>Image Gallery App.</p>
         <form onSubmit={handleSubmit}>
           <div className="input-group">
             <label htmlFor="fullName">Full Name</label>
@@ -77,6 +82,7 @@ function Register() {
               onChange={handleChange} 
             />
           </div>
+          
           <button type="submit" className="register-button">Register</button>
         </form>
         <p className="login-link">Already have an account? <Link to="/login">Login here</Link></p>

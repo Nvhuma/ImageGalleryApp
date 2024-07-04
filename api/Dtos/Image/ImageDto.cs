@@ -13,11 +13,11 @@ namespace api.Dtos.Image
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         
-        public string ImageURL {get; set;}
+        public string ? ImageURL {get; set;}
         public DateTime CreatedDate { get; set; }
-        public string UserId { get; set; }
+        public string ? UserId { get; set; }
 
-        public string AppUser { get; set;}
+        public string ? AppUser { get; set;}
 
         public List<CommentDto> Comments {get; set;} 
         public List<TagDto> Tags {get; set;}
