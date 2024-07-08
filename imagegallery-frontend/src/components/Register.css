@@ -91,13 +91,13 @@
 	padding: 10px;
 	border: 1px solid #9b9696; /* Border for social buttons */
 	border-radius: 5px;
-	background-color: #4a55ee;
+	background-color: #d6d7e6;
 	cursor: pointer;
 	transition: background-color 0.3s ease; /* Smooth transition for hover effect */
   }
   
   .social-login button:hover {
-	background-color: #f1f1f1; /* Light gray on hover */
+	background-color: #4245ec; /* Light gray on hover */
   }
   
   .social-login img {

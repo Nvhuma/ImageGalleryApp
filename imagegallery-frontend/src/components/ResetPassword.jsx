@@ -22,13 +22,13 @@ const ResetPassword = () => {
     }
 
     try {
-      const response = await axios.post('/api/account/reset-password', { email, password });
+      const response = await axios.post('http://localhost:5263/api/Account/reset-password', { email, password });
       console.log("API response: ", response);
       // Navigate to login or some other page after successful reset
       navigate('/login');
     } catch (error) {
       console.error("Error during password reset: ", error);
-      alert("Error resetting password");
+      alert("Error resetting password. Please try again.");
     }
   };
 
