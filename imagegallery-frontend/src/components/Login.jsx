@@ -5,33 +5,26 @@ import '@fortawesome/fontawesome-free/css/all.min.css'; // Import Font Awesome
 import axios from "axios";
 
 function Login() {
-  // Define state variables for username and password
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  // Handle the login form submission
   const handleLogin = async (e) => {
     e.preventDefault();
     console.log("Login attempted with:", username, password);
 
     try {
-      // Make an HTTP POST request to the backend login endpoint
       const response = await axios.post("http://localhost:5263/api/Account/login", {
         UserName: username,
         Password: password
       });
 
-      // Log the response from the server
       console.log("Login response:", response.data);
 
-      // Optionally, store the token and user info in local storage or context
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data));
 
-      // Redirect or perform further actions based on the login success
       alert("Login successful!");
     } catch (error) {
-      // Handle errors such as incorrect login credentials
       console.error("Login error:", error);
       alert("Login failed! Please check your username and password.");
     }
@@ -44,6 +37,7 @@ function Login() {
         <h2>Log in</h2>
         <form onSubmit={handleLogin}>
           <div className="input-group">
+            <label htmlFor="username" className="input-label">Username</label>
             <div className="input-icon">
               <i className="fas fa-user"></i>
               <input
@@ -52,11 +46,12 @@ function Login() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="          Enter Username"
-                required // Make the field required
+                required
               />
             </div>
           </div>
           <div className="input-group">
+            <label htmlFor="password" className="input-label">Password</label>
             <div className="input-icon">
               <i className="fas fa-lock"></i>
               <input
@@ -65,16 +60,12 @@ function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="          Enter Password"
-                required // Make the field required
+                required
               />
             </div>
           </div>
-          <a href="#" className="forgot-password">
-            Forgot Password?
-          </a>
-          <button type="submit" className="login-button">
-            Login
-          </button>
+           <Link to="/reset-password" className="forgot-password">Forgot Password?</Link>
+          <button type="submit" className="login-button">Login</button>
         </form>
         <p className="register-link">
           New to this platform? <Link to="/register">Register Here</Link>

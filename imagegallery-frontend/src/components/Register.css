@@ -1,35 +1,24 @@
-/* Register.css */
-
-/* Register container with adjusted left alignment */
+/* Register container with left alignment */
 .register-container {
 	display: flex;
-	justify-content: flex-start; /* Align content to the left */
-	align-items: center;
 	height: 100vh;
-	background-color: #f8f9fa; /* Light background color */
-	padding: 0 20px; /* Padding around the container */
-	box-sizing: border-box; /* Include padding in the width and height */
-	overflow: hidden; /* Prevent overflow issues */
-	position: relative; /* Required for z-indexing */
+	background-color: #fff; /* White background color */
   }
   
-  /* Form section styling */
   .form-section {
-	background-color: #fff; /* White background for the form */
-	padding: 40px; /* Space inside the form container */
-	border-radius: 10px; /* Rounded corners */
-	box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Soft shadow */
 	width: 400px; /* Fixed width for the form */
-	margin-right: 40px; /* Space between form and image */
-	box-sizing: border-box; /* Include padding in the width calculation */
-	position: relative; /* Required for z-indexing */
+	padding: 40px;
+	background-color: #fff;
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Soft shadow */
+	border-radius: 10px; /* Rounded corners */
+	box-sizing: border-box;
 	z-index: 10; /* Higher z-index to ensure it's on top */
+	position: relative; /* Required for z-indexing */
   }
   
-  /* Adjusted image section */
   .image-section {
 	flex: 1; /* Take up remaining space */
-	background-image: url('/mnt/data/rnbbb.png'); /* Path to the image */
+	background-image: url('/mnt/data/S2.png'); /* Path to the image */
 	background-size: cover; /* Cover the entire container */
 	background-position: center; /* Center the image */
 	border-radius: 10px; /* Matching rounded corners */
@@ -38,17 +27,16 @@
 	z-index: 1; /* Lower z-index to ensure it's behind the form */
   }
   
-  
   /* Typography */
   h1 {
 	font-size: 24px;
-	color: #333; /* Dark gray color */
+	color: #007bff; /* Primary blue color */
 	margin-bottom: 10px;
   }
   
   p {
 	font-size: 14px;
-	color: #666; /* Light gray color */
+	color: #333; /* Dark gray color */
 	margin-bottom: 20px;
   }
   
@@ -60,7 +48,7 @@
   .input-group label {
 	display: block;
 	font-size: 14px;
-	color: #333;
+	color: #007bff; /* Primary blue color */
 	margin-bottom: 5px;
   }
   
@@ -101,9 +89,9 @@
 	align-items: center;
 	justify-content: center;
 	padding: 10px;
-	border: 1px solid #ccc; /* Border for social buttons */
+	border: 1px solid #9b9696; /* Border for social buttons */
 	border-radius: 5px;
-	background-color: #fff;
+	background-color: #4a55ee;
 	cursor: pointer;
 	transition: background-color 0.3s ease; /* Smooth transition for hover effect */
   }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using api.Dtos.Account;
 using api.Interfaces;
 using api.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,69 +16,50 @@ namespace api.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        // Private fields for dependency injection
         private readonly ITokenService _tokenService;
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signinmanager;
+        private readonly IEmailService _emailService;
 
-        // Constructor with dependency injection
-        public AccountController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signinmanager)
+        public AccountController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signinmanager, IEmailService emailService)
         {
             _userManager = userManager;
             _tokenService = tokenService;
             _signinmanager = signinmanager;
+            _emailService = emailService;
         }
 
-        // HTTP POST endpoint for user login
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto loginDto)
         {
-            // Check if the model state is valid
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            // Find the user by username
             var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.UserName.ToLower());
 
-            // If user not found, return unauthorized
-          //  if (user == null) return Unauthorized("Invalid username!");
+            if (user == null) return Unauthorized("Invalid username!");
 
-               if (user == null) return Unauthorized("Invalid username!"); // Updated for better clarity
-
-
-            // Check the password
             var result = await _signinmanager.CheckPasswordSignInAsync(user, loginDto.Password, false);
 
-            // If password check failed, return unauthorized
+            if (!result.Succeeded) return Unauthorized("USERNAME NOT FOUND AND/OR PASSWORD INCORRECT!");
 
-            //if (!result.Succeeded) return Unauthorized("USERNAME NOT FOUND AND/OR PASSWORD INCORRECT!");
-
-            if (!result.Succeeded) return Unauthorized("USERNAME NOT FOUND AND/OR PASSWORD INCORRECT!"); // Updated for better clarity
-
-
-            // If login successful, return user details and token
             return Ok(
                 new NewUserDto
                 {
-                    UserName  = user.UserName,
+                    UserName = user.UserName,
                     EmailAddress = user.Email,
-                   // token = _tokenService.CreateToken(user)
-                    token = _tokenService.CreateToken(user) // Changed 'Token' to 'token'
-
+                    token = _tokenService.CreateToken(user)
                 }
             );
         }
 
-        // HTTP POST endpoint for user registration
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
             try
             {
-                // Check if the model state is valid
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                // Create a new AppUser object
                 var appUser = new AppUser
                 {
                     UserName = registerDto.UserName,
@@ -85,16 +67,13 @@ namespace api.Controllers
                     Names = registerDto.Names,
                 };
 
-                // Attempt to create the user
                 var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
 
                 if (createdUser.Succeeded)
                 {
-                    // If user creation succeeded, add the user to the "User" role
                     var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
                     if (roleResult.Succeeded)
                     {
-                        // If role assignment succeeded, return user details and token
                         return Ok(
                             new NewUserDto
                             {
@@ -106,21 +85,58 @@ namespace api.Controllers
                     }
                     else
                     {
-                        // If role assignment failed, return 500 status code with errors
                         return StatusCode(500, roleResult.Errors);
                     }
                 }
                 else
                 {
-                    // If user creation failed, return 500 status code with errors
                     return StatusCode(500, createdUser.Errors);
                 }
             }
             catch (Exception e)
             {
-                // If any exception occurs, return 500 status code with the exception
                 return StatusCode(500, e);
             }
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordDto forgotPasswordDto)
+        {
+            var user = await _userManager.FindByEmailAsync(forgotPasswordDto.Email);
+            if (user == null)
+            {
+                return BadRequest(new { message = "User not found." });
+            }
+
+            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var resetLink = Url.Action(nameof(ResetPasswordDto), "Account", new { token = resetToken, email = user.Email }, Request.Scheme);
+            var emailResult = await _emailService.SendPasswordResetEmailAsync(user.Email, resetLink);
+
+            if (!emailResult)
+            {
+                return StatusCode(500, new { message = "Failed to send password reset email." });
+            }
+
+            return Ok(new { message = "Password reset email sent successfully." });
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDto resetPasswordDto)
+        {
+            var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
+            if (user == null)
+            {
+                return BadRequest(new { message = "Invalid email address." });
+            }
+
+            var resetPassResult = await _userManager.ResetPasswordAsync(user, resetPasswordDto.Token, resetPasswordDto.NewPassword);
+            if (!resetPassResult.Succeeded)
+            {
+                var errors = resetPassResult.Errors.Select(e => e.Description);
+                return BadRequest(new { message = "Password reset failed.", errors });
+            }
+
+            return Ok(new { message = "Password has been reset successfully." });
         }
     }
 }
