@@ -31,10 +31,10 @@ function Login() {
   };
 
   return (
-    <div className="App">
+    <div className="login-page">
       <div className="login-container">
         <h1>Image Gallery App</h1>
-        <h2>Log in</h2>
+        <h2>Login</h2>
         <form onSubmit={handleLogin}>
           <div className="input-group">
             <label htmlFor="username" className="input-label">Username</label>
@@ -45,7 +45,7 @@ function Login() {
                 id="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="          Enter Username"
+                placeholder="Enter Username"
                 required
               />
             </div>
@@ -59,12 +59,12 @@ function Login() {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="          Enter Password"
+                placeholder="Enter Password"
                 required
               />
             </div>
           </div>
-           <Link to="/reset-password" className="forgot-password">Forgot Password?</Link>
+          <Link to="/ForgotPassword" className="forgot-password">Forgot Password?</Link>
           <button type="submit" className="login-button">Login</button>
         </form>
         <p className="register-link">

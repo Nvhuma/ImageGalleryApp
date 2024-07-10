@@ -69,7 +69,7 @@ function Register() {
     <div className="register-container">
       <div className="form-section">
         <h1>Register Profile</h1>
-        <p>Lorem ipsum dolor sit amet consectetur sit amet consectetur.</p>
+        <p></p>
         {error && <p className="error-message">{error}</p>} {/* Display error message */}
         <form onSubmit={handleSubmit}>
           <div className="input-group">
