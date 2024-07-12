@@ -1,6 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap'); /* Import the Poppins font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
-/* Ensure styles are scoped to the login container */
 .login-page {
   display: flex;
   justify-content: center;
@@ -10,8 +9,8 @@
   background-size: cover;
   background-position: center;
   position: relative;
-  font-family: 'Poppins', sans-serif; /* Apply Poppins font */
-  color: #262aa2ec;
+  font-family: 'Poppins', sans-serif;
+  color:#0F3C4C;
 }
 
 .login-page::before {
@@ -21,38 +20,39 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* Dark overlay */
+  background: rgba(0, 0, 0, 0.5);
 }
 
 .login-container {
   position: relative;
   z-index: 1;
   background-color: white;
-  padding: 3rem 2rem; /* More padding for better appearance */
-  border-radius: 10px; /* Slightly larger border-radius */
+  padding: 3rem 2rem;
+  border-radius: 10px;
   box-shadow: 0 0 30px rgba(60, 24, 244, 0.1);
   width: 100%;
-  max-width: 400px; /* Fixed max-width */
+  max-width: 400px;
   text-align: center;
 }
 
 .login-container h1 {
-  color: #071f6de5; /* Match the color from the prototype */
+  color:#0F3C4C;
   margin-bottom: 1rem;
-  font-size: 2rem; /* Match the font size from the prototype */
-  font-weight: 600; /* Match the font weight from the prototype */
+  font-size: 2rem;
+  font-weight: 600;
 }
 
 .input-group {
   position: relative;
-  margin-bottom: 1.5rem; /* More space between inputs */
+  margin-bottom: 1.5rem;
 }
 
 .input-label {
   display: block;
   margin-bottom: 0.5rem;
-  color: #1e4be1; /* Match the color from the prototype */
+  color: #1e4be1;
   text-align: left;
+  padding: 0.75rem;
 }
 
 .input-icon {
@@ -63,38 +63,44 @@
 
 .input-icon i {
   position: absolute;
-  left: 10px; /* Adjusted padding */
-  padding: 0.5rem;
+  left: 10px;
   pointer-events: none;
   color: #8a8686;
+  transition: opacity 0.3s ease;
 }
 
 .input-icon input {
   width: 100%;
-  padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+  padding: 1.85rem 1.85rem 1.84rem 2.5rem;
   border: 1px solid #ddd;
   border-radius: 4px;
   margin-bottom: 0;
-  color: #1e4be1; /* Text color to match the label */
+  color: #060504;
   font-family: 'Poppins', sans-serif;
+}
+
+/* Hide the icon on hover */
+.input-icon input:hover + i,
+.input-icon.active i {
+  opacity: 0;
 }
 
 .login-container .forgot-password {
   display: block;
   text-align: right;
   margin-bottom: 1rem;
-  color: #1e4be1; /* Match the color from the prototype */
+  color: #1e4be1;
   text-decoration: none;
 }
 
 .login-container .forgot-password:hover {
-  text-decoration: underline; /* Hover effect */
+  text-decoration: underline;
 }
 
 .login-container .login-button {
   width: 100%;
   padding: 0.75rem;
-  background-color: #1e4be1; /* Match the color from the prototype */
+  background-color:#0F3C4C;
   color: white;
   border: none;
   border-radius: 4px;
@@ -104,15 +110,15 @@
 }
 
 .login-container .login-button:hover {
-  background-color: #084a59; /* Slightly darker on hover */
+  background-color:#0F3C4C;
 }
 
 .login-container .register-link {
   margin-top: 1rem;
-  color: #1e4be1; /* Match the color from the prototype */
+  color:#0F3C4C;
   text-decoration: none;
 }
 
 .login-container .register-link:hover {
-  text-decoration: underline; /* Hover effect */
+  text-decoration: underline;
 }

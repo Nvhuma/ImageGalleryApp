@@ -22,15 +22,16 @@ namespace api.Controllers
         // Dependencies injected through constructor
         private readonly IImageRepository _imageRepo;
         private readonly ApplicationDBContext _context;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly ILogger<ImageController> _logger;
 
-         private readonly UserManager<AppUser> _userManager;
-
-         
         // Constructor
-        public ImageController(ApplicationDBContext context, IImageRepository imageRepo)
+        public ImageController(ApplicationDBContext context, IImageRepository imageRepo, ILogger<ImageController> logger, UserManager<AppUser> userManager)
         {
             _imageRepo = imageRepo;
             _context = context;
+            _logger = logger;
+            _userManager = userManager;
         }
 
         // GET: api/image
@@ -43,7 +44,7 @@ namespace api.Controllers
             return Ok(imageDto);
         }
 
-        // GET: api/image/{id}
+        // GET: api/image/{id:int}
         // Retrieves a specific image by ID
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
@@ -55,79 +56,6 @@ namespace api.Controllers
             }
             return Ok(images.ToImageDto());
         }
-
-        // POST: api/image
-        // Creates a new image
-        // [HttpPost]
-        // public async Task<IActionResult> Create([FromForm] CreateImageRequestDto ImageDto)
-        // {
-        //     var ImageModel = ImageDto.ToImageFromCreateDTO();
-        //     var imageModel = new Image
-        //     {
-        //         Title = ImageDto.Title,
-        //         Description = ImageDto.Description,
-        //         CreatedDate = DateTime.UtcNow,
-        //        // UserId = ImageDto.UserId,
-        //         ImageURL = ImageDto.ImageURL // Ensuring that the URL is set
-        //     };
-        //     await _imageRepo.CreateAsync(ImageModel);
-        //     return CreatedAtAction(nameof(GetById), new { Id = ImageModel.ImageId}, ImageModel.ToImageDto());
-        // }
-
-
-    [HttpPost]
-public async Task<IActionResult> Create([FromForm] CreateImageRequestDto ImageDto)
-{
-    // Validate the model state
-    if (!ModelState.IsValid)
-    {
-        return BadRequest(ModelState);
-    }
-
-    // Retrieve the logged-in user's email
-    var userEmail = User.GetUserEmail();
-
-    // Check if the user email is valid
-    if (string.IsNullOrEmpty(userEmail))
-    {
-        return BadRequest("User not authenticated or email claim not found.");
-    }
-
-    // Find the user by email
-    var appUser = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
-
-    // Check if the user exists
-    if (appUser == null)
-    {
-        return BadRequest("User not found.");
-    }
-
-    // Validate that critical fields in ImageDto are not null or empty
-    if (string.IsNullOrEmpty(ImageDto.Title))
-    {
-        return BadRequest("Title cannot be null or empty.");
-    }
-
-    // Create the image model and associate it with the user
-    var imageModel = new Image
-    {
-        Title = ImageDto.Title,
-        Description = ImageDto.Description,
-        CreatedDate = DateTime.UtcNow,
-        UserId = appUser.Id, // Associate the image with the user
-        ImageURL = ImageDto.ImageURL // Ensure the URL is set
-    };
-
-    // Save the image to the database
-    await _imageRepo.CreateAsync(imageModel);
-
-    // Return the created image response
-    return CreatedAtAction(nameof(GetById), new { Id = imageModel.ImageId }, imageModel.ToImageDto());
-}
-
-
-
-
 
         // PUT: api/image/{id}
         // Updates an existing image
@@ -155,6 +83,83 @@ public async Task<IActionResult> Create([FromForm] CreateImageRequestDto ImageDt
                 return NotFound();
             }
             return NoContent();
+        }
+
+        // POST: api/image
+        // Creates a new image
+        [HttpPost]
+        public async Task<IActionResult> Create([FromForm] CreateImageRequestDto ImageDto)
+        {
+            try
+            {
+                _logger.LogInformation("Create method called.");
+
+                if (ImageDto == null)
+                {
+                    _logger.LogError("ImageDto is null.");
+                    return BadRequest("ImageDto cannot be null.");
+                }
+
+                // Validate the model state
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogError("Model state is invalid.");
+                    return BadRequest(ModelState);
+                }
+
+                // Retrieve the logged-in user's email
+                var userEmail = User?.GetUserEmail();
+                _logger.LogInformation($"User email retrieved: {userEmail}");
+
+                // Check if the user email is valid
+                if (string.IsNullOrEmpty(userEmail))
+                {
+                    _logger.LogError("User not authenticated or email claim not found.");
+                    return BadRequest("User not authenticated or email claim not found.");
+                }
+
+                // Find the user by email
+                var appUser = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+                _logger.LogInformation($"User found: {appUser?.Id}");
+
+                // Check if the user exists
+                if (appUser == null)
+                {
+                    _logger.LogError("User not found.");
+                    return BadRequest("User not found.");
+                }
+
+                // Validate that critical fields in ImageDto are not null or empty
+                if (string.IsNullOrEmpty(ImageDto.Title))
+                {
+                    _logger.LogError("Title cannot be null or empty.");
+                    return BadRequest("Title cannot be null or empty.");
+                }
+
+                // Create the image model and associate it with the user
+                var imageModel = new Image
+                {
+                    Title = ImageDto.Title,
+                    Description = ImageDto.Description,
+                    CreatedDate = DateTime.UtcNow,
+                    UserId = appUser.Id, // Associate the image with the user
+                    ImageURL = ImageDto.ImageURL // Ensure the URL is set
+                };
+
+                _logger.LogInformation("Image model created.");
+
+                // Save the image to the database
+                await _imageRepo.CreateAsync(imageModel);
+                _logger.LogInformation("Image saved to the database.");
+
+                // Return the created image response
+                return CreatedAtAction(nameof(GetById), new { Id = imageModel.ImageId }, imageModel.ToImageDto());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating the image.");
+                return StatusCode(500, "Internal server error.");
+            }
         }
     }
 }

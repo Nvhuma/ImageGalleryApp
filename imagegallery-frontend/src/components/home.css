@@ -1,0 +1,146 @@
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	font-family: 'Arial', sans-serif;
+  }
+  
+  .container {
+	display: flex;
+	height: 100vh;
+  }
+  
+  .sidebar {
+	width: 240px;
+	background-color: #2C8E9B;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	padding: 20px 0;
+  }
+  
+  .menu-item, .logout {
+	display: flex;
+	align-items: center;
+	padding: 15px 20px;
+	color: white;
+	cursor: pointer;
+  }
+  
+  .menu-item.active, .menu-item:hover, .logout:hover {
+	background-color: #226b7d;
+  }
+  
+  .menu-item span, .logout span {
+	margin-left: 10px;
+	font-size: 18px;
+  }
+  
+  .content {
+	flex-grow: 1;
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+  }
+  
+  .header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
+  }
+  
+  .search-bar {
+	display: flex;
+	align-items: center;
+	background-color: #f1f1f1;
+	border-radius: 5px;
+	padding: 5px 10px;
+  }
+  
+  .search-bar input {
+	border: none;
+	background: transparent;
+	outline: none;
+	padding: 5px;
+	margin-left: 5px;
+	font-size: 16px;
+  }
+  
+  .filter-button {
+	display: flex;
+	align-items: center;
+	padding: 5px 15px;
+	background-color: #d9d9d9;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	font-size: 16px;
+  }
+  
+  .filter-button:hover {
+	background-color: #c1c1c1;
+  }
+  
+  .image-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 20px;
+  }
+  
+  .image-item {
+	background: white;
+	border-radius: 10px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+  }
+  
+  .image-item img {
+	width: 100%;
+	height: auto;
+  }
+  
+  .item-details {
+	padding: 20px;
+  }
+  
+  .item-details h4.name {
+	margin-bottom: 10px;
+	font-size: 20px;
+  }
+  
+  .item-details p.description {
+	color: #777;
+	font-size: 14px;
+	line-height: 1.6;
+  }
+  
+  .pagination {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-top: 20px;
+  }
+  
+  .pagination button {
+	background: none;
+	border: none;
+	padding: 10px 15px;
+	cursor: pointer;
+	font-size: 16px;
+	color: #2C8E9B;
+  }
+  
+  .pagination button.active {
+	background-color: #2C8E9B;
+	color: white;
+	border-radius: 5px;
+  }
+  
+  .pagination button:disabled {
+	cursor: not-allowed;
+	opacity: 0.5;
+  }
+  

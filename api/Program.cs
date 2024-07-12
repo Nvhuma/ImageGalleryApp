@@ -14,24 +14,21 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Cors;
 
 
-
-
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Add configuration sources
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true);
+builder.Configuration.AddEnvironmentVariables();
 
 // CORS Configuration: Allow requests from the React app
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
         builder => builder.WithOrigins("http://localhost:5173") // Your React app's URL
                           .AllowAnyHeader()
                           .AllowAnyMethod());
-
 });
-
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -40,7 +37,7 @@ builder.Services.AddSwaggerGen(option =>
 {
     option.SwaggerDoc("v1", new OpenApiInfo { Title = "ImageGallery API", Version = "v1" });
 
-     // Add JWT security definition in Swagger
+    // Add JWT security definition in Swagger
     option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -68,7 +65,6 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-
 // Database Context configuration using SQL Server
 builder.Services.AddControllers().AddNewtonsoftJson(options =>{
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
@@ -79,7 +75,6 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>{
      options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-
 builder.Services.AddIdentity<AppUser, IdentityRole>(options => 
 {
     options.Password.RequireDigit = true;
@@ -87,17 +82,20 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
     options.Password.RequireUppercase = true;
     options.Password.RequireNonAlphanumeric = true;
     options.Password.RequiredLength = 15;
-})
-.AddEntityFrameworkStores<ApplicationDBContext>();
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    options.Lockout.MaxFailedAccessAttempts = 5;
 
+})
+.AddEntityFrameworkStores<ApplicationDBContext>()
+.AddDefaultTokenProviders(); // Ensure this line is present
 
 // JWT Authentication configuration
 builder.Services.AddAuthentication(options => {
- options.DefaultAuthenticateScheme =
- options.DefaultChallengeScheme =
- options.DefaultForbidScheme =
- options.DefaultScheme =
- options.DefaultSignInScheme =
+ options.DefaultAuthenticateScheme =JwtBearerDefaults.AuthenticationScheme;
+ options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+ options.DefaultForbidScheme = JwtBearerDefaults.AuthenticationScheme;
+ options.DefaultScheme =JwtBearerDefaults.AuthenticationScheme;
+ options.DefaultSignInScheme =JwtBearerDefaults.AuthenticationScheme;
  options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
 
 }).AddJwtBearer(options =>
@@ -115,15 +113,14 @@ builder.Services.AddAuthentication(options => {
     };
 });
 
-
 // Registering repositories and services for dependency injection
 builder.Services.AddScoped<IImageTagRepository, ImageTagRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IImageRepository, ImageRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IEmailService, EmailService>();
-
+builder.Services.AddScoped<IEmailService, EmailService>(); 
+builder.Services.AddLogging();
 
 var app = builder.Build();
 
@@ -151,6 +148,3 @@ app.MapControllers();
 
 // Run the application
 app.Run();
-
-
-

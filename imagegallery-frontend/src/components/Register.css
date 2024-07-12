@@ -4,7 +4,7 @@
 body {
   margin: 0;
   font-family: 'Poppins', sans-serif;
-  color: #1e4be1;
+  color: #084a59;
 }
 
 .register-container {
@@ -37,7 +37,7 @@ body {
 /* Typography */
 h1 {
   font-size: 2rem;
-  color: #1e4be1; /* Primary blue color */
+  color:#0F3C4C; /* Primary blue color */
   margin-bottom: 1rem;
   font-weight: 600; /* Bold font */
 }
@@ -56,8 +56,9 @@ p {
 .input-group label {
   display: block;
   font-size: 1rem;
-  color: #1e4be1; /* Primary blue color */
+  color:#084a59;/* Primary blue color */
   margin-bottom: 0.5rem;
+  font-weight: bold;
 }
 
 .input-group input {
@@ -72,7 +73,7 @@ p {
 .register-button {
   width: 100%;
   padding: 0.75rem;
-  background-color: #007bff; /* Primary blue color */
+  background-color:#0F3C4C; /* Primary blue color */
   color: #fff;
   border: none;
   border-radius: 5px;
@@ -109,7 +110,7 @@ p {
 }
 
 .social-login button:hover {
-  background-color:  #0056b3; /* Light gray on hover */
+  background-color:  #084a59; /* Light gray on hover */
 }
 
 .social-login img {

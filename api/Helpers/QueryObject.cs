@@ -13,6 +13,7 @@ namespace api.Helpers
         public string? SortBy { get; internal set; } = null;
         public int PageNumber { get; set; } = 1;
 
+       //  public string ImageURL {get; set;}
         public int PageSize { get; set; } = 20;
 
 

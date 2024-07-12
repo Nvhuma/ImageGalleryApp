@@ -28,7 +28,7 @@ namespace api.Controllers
             _signinmanager = signinmanager;
             _emailService = emailService;
         }
-
+        
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto loginDto)
         {
@@ -74,6 +74,18 @@ namespace api.Controllers
                     var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
                     if (roleResult.Succeeded)
                     {
+                        var token = _tokenService.CreateToken(appUser);
+
+                        // Populate AspNetUserTokens table
+                        var result = await _userManager.SetAuthenticationTokenAsync(
+                            appUser,
+                            "TokenProvider", // i can  Replace with token provider name
+                            "AccessToken", //  i can use any name for the token
+                            token
+                        );
+
+                        if (result.Succeeded)
+                    {
                         return Ok(
                             new NewUserDto
                             {
@@ -82,6 +94,11 @@ namespace api.Controllers
                                 token = _tokenService.CreateToken(appUser)
                             }
                         );
+                    }
+                    else{
+                        return StatusCode(500, "Fallied to save token");
+                    }
+
                     }
                     else
                     {
@@ -119,6 +136,7 @@ namespace api.Controllers
 
             return Ok(new { message = "Password reset email sent successfully." });
         }
+        
 
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPasswordDto resetPasswordDto)

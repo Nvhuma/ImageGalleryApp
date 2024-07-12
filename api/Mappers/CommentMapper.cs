@@ -31,7 +31,7 @@ namespace api.Mappers
             {
                 Content = commentDto.Content,
                 ImageId = ImageId,
-                //UserId = User
+            ///UserId = User
             };
         }
 
