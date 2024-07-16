@@ -9,7 +9,11 @@ const Home = () => {
   const totalPages = 3; // Example total number of pages
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const imageItems = document.querySelectorAll('.image-item');
+  if (imageItems.length === 1) {
+      imageItems[0].classList.add('single');
+  }
+  
   useEffect(() => {
     const fetchImages = async () => {
       try {
@@ -31,14 +35,17 @@ const Home = () => {
   };
 
   const filteredImages = images.slice(
-    (currentPage - 1) * 10,
-    currentPage * 10
+    (currentPage - 1) * 4,
+    currentPage * 4
   );
 
   return (
     <div className="container">
       <div className="sidebar">
-        <div>
+        <div className="logo-section">
+          <div className="logo">Logo</div>
+        </div>
+        <div className="menu">
           <div className="menu-item active">
             <FaHome />
             <span>Home</span>
@@ -55,6 +62,13 @@ const Home = () => {
       </div>
       <div className="content">
         <div className="header">
+          <h2>Home</h2>
+          <div className="user">
+            <span>User</span>
+            <img src="/src/assets/user.png" alt="User Avatar" />
+          </div>
+        </div>
+        <div className="search-filter">
           <div className="search-bar">
             <MdSearch />
             <input type="text" placeholder="Search for..." />
@@ -69,17 +83,17 @@ const Home = () => {
             <p>Loading...</p>
           ) : (
             filteredImages.map((image, index) => (
-				<div key={image.id || index} className="image-item">
-				  {image.imageURL ? (
-					<img src={image.imageURL} alt={image.title} />
-				  ) : (
-					<div className="placeholder">Image not available</div>
-				  )}
-				  <div className="item-details">
-					<h4 className="name">{image.title}</h4>
-					<p className="description">{image.description}</p>
-				  </div>
-				</div>
+              <div key={image.id || index} className="image-item">
+                {image.imageURL ? (
+                  <img src={image.imageURL} alt={image.title} />
+                ) : (
+                  <div className="placeholder">Image not available</div>
+                )}
+                <div className="item-details">
+                  <h4 className="name">{image.title}</h4>
+                  <p className="description">{image.description}</p>
+                </div>
+              </div>
             ))
           )}
         </div>

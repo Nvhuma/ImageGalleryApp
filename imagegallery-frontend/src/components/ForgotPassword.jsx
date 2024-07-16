@@ -22,6 +22,7 @@ function ForgotPassword() {
                 setMessage('Error sending password reset link.');
             }
         } finally {
+            setMessage('Password reset link has been sent to your email.')
             setLoading(false);
         }
     };

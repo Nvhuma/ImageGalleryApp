@@ -13,7 +13,7 @@ namespace api.Interfaces
     // <param name="subject">The subject of the email.</param>
     // <param name="message">The message body of the email.</param>
     // <returns>A task representing the asynchronous operation, with a boolean result indicating success or failure.</returns>
-    Task<bool> SendEmailAsync(string toEmail, string subject, string message);
+    Task SendEmailAsync(string email, string subject, string message);
    
     // Sends a password reset email with a reset link to the specified recipient.
     

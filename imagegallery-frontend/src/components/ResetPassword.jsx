@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './ResetPassword.css';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';  // Assuming you are using axios for API calls
 
 const ResetPassword = () => {
@@ -65,7 +65,7 @@ const ResetPassword = () => {
         </form>
       </div>
       <div className="reset-password-image">
-        <img src="/path/to/your/image.jpg" alt="Reset Password" />
+        <img src="/src/assets/image-gallery.jpeg" alt="Reset Password" />
       </div>
     </div>
   );

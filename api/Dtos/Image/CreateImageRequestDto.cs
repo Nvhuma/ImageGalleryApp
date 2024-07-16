@@ -10,7 +10,7 @@ namespace api.Dtos.Image
     public class CreateImageRequestDto
     {
         [Required]
-        [MinLength(5,  ErrorMessage = "title must be 3 characters")]
+        [MinLength(5,  ErrorMessage = "title must be more 5 characters")]
         [MaxLength(10000000, ErrorMessage = "title cannot be over 10000000 characters")]
         public string Title { get; set; } = string.Empty;
 
