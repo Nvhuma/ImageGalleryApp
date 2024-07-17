@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using System.Web;
 using api.Dtos.Account;
 using api.Interfaces;
 using api.Models;
@@ -79,10 +81,29 @@ namespace api.Controllers
 
                 if (createdUser.Succeeded)
                 {
+                    // Generate email confirmation token
+                    var emailConfirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
+                    var encodedToken = HttpUtility.UrlEncode(emailConfirmationToken);
+                    // Create the confirmation link
+                    var confirmationLink = Url.Action("ConfirmEmail", "Account",
+                        new { userId = appUser.Id, token = emailConfirmationToken }, Request.Scheme);
+
+                    // Send the confirmation email
+                    // (Assuming _emailSender is an instance of a service to send emails)
+                    var emailContent = $@"
+                    Please confirm your account by clicking this link: <a href='{confirmationLink}'>Confirm Email</a><br /><br />
+                    The information contained in this communication is confidential and may be legally privileged. It is intended solely for use by the originator and others authorised to receive it. If you are not that person you are hereby notified that any disclosure, copying, distribution or taking action in reliance of the contents of this information is strictly prohibited and may be unlawful. Neither Singular Systems (Pty) Ltd (Registration 2002/001492/07) nor any of its subsidiaries are liable for the proper, complete transmission of the information contained in this communication, or for any delay in its receipt, or for the assurance that it is virus-free. If you have received this in error please report it to: sis@singular.co.za, IT";
+
+                    await _emailService.SendEmailAsync(appUser.Email, "Confirm your email",
+                        $"Please confirm your account by clicking this link: <a href='{confirmationLink}'>link</a>");
+
+                    // Create the token
+                    var token = _tokenService.CreateToken(appUser);
+
                     var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
                     if (roleResult.Succeeded)
                     {
-                        var token = _tokenService.CreateToken(appUser);
+                        var AccessToken = _tokenService.CreateToken(appUser);
 
                         // Populate AspNetUserTokens table
                         var result = await _userManager.SetAuthenticationTokenAsync(
@@ -125,21 +146,21 @@ namespace api.Controllers
             }
         }
 
-    
+
 
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
         {
-            
-            if(!ModelState.IsValid)
+
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            
+
             var user = await _userManager.FindByEmailAsync(forgotPasswordDto.Email);
-            if(user == null) return NotFound("User with email does not exist");
+            if (user == null) return NotFound("User with email does not exist");
 
             var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-           // var resetLink = Url.Action("ResetPassword", "Account", new{token = resetToken, email = forgotPasswordDto.Email}, Request.Scheme);
-          var  resetLink = $"http://localhost:5173/reset-password?Email={forgotPasswordDto.Email}&token={Uri.EscapeDataString(resetToken)}";
+            // var resetLink = Url.Action("ResetPassword", "Account", new{token = resetToken, email = forgotPasswordDto.Email}, Request.Scheme);
+            var resetLink = $"http://localhost:5173/reset-password?Email={forgotPasswordDto.Email}&token={Uri.EscapeDataString(resetToken)}";
 
             await _emailService.SendEmailAsync(user.Email, "Reset Password Image Gallery", $"Please reset your password by clicking on this link: {resetLink}");
 
@@ -160,32 +181,32 @@ namespace api.Controllers
 
             //  using  service .NET's built-in SmtpClient
 
-            
-                var smtpHost = _configuration["Smtp:Host"];
-                var smtpPortString = int.Parse(_configuration["Smtp:Port"]);
-                var smtpUsername = _configuration["Smtp:Username"];
-                var smtpPassword = _configuration["Smtp:Password"];
-                var SmtpFrom = _configuration["Smtp:FromAddress"];
 
-               
-                var SmtpClient = new SmtpClient(smtpHost)
-                {
-                    Port = 587,
-                    Credentials = new NetworkCredential(smtpUsername, smtpPassword),
-                    EnableSsl = true
-                };
+            var smtpHost = _configuration["Smtp:Host"];
+            var smtpPortString = int.Parse(_configuration["Smtp:Port"]);
+            var smtpUsername = _configuration["Smtp:Username"];
+            var smtpPassword = _configuration["Smtp:Password"];
+            var SmtpFrom = _configuration["Smtp:FromAddress"];
 
-                var mailMessage = new MailMessage
-                {
-                    From = new MailAddress(SmtpFrom),
-                    Subject = "Password Reset Request",
-                    Body = $"Please reset your password by clicking on this link: {resetLink}",
-                    IsBodyHtml = true
-                };
 
-                mailMessage.To.Add(email);
-                
-                try
+            var SmtpClient = new SmtpClient(smtpHost)
+            {
+                Port = 587,
+                Credentials = new NetworkCredential(smtpUsername, smtpPassword),
+                EnableSsl = true
+            };
+
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress(SmtpFrom),
+                Subject = "Password Reset Request",
+                Body = $"Please reset your password by clicking on this link: {resetLink}",
+                IsBodyHtml = true
+            };
+
+            mailMessage.To.Add(email);
+
+            try
             {
                 await SmtpClient.SendMailAsync(mailMessage);
                 _logger.LogInformation("Email sent successfully to {Email}", email);
@@ -196,12 +217,31 @@ namespace api.Controllers
                 // Log the exception
                 throw new InvalidOperationException("Could not send email", ex);
             }
-          
+
         }
 
 
 
+        [HttpGet("confirmemail")]
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        {
+            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(token))
+                return BadRequest("User Id and Token are required");
 
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return NotFound("User not found");
+
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+            if (result.Succeeded)
+            {
+                return Ok("Email confirmed successfully!");
+            }
+            else
+            {
+                return StatusCode(500, "Email confirmation failed");
+            }
+        }
 
 
         [HttpPost("reset-password")]

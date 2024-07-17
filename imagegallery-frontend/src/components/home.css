@@ -157,6 +157,7 @@ body {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
+ 
 }
 
 .image-item {
@@ -167,6 +168,9 @@ body {
     display: flex;
     flex-direction: column;
     transition: transform 0.2s;
+    position:relative;
+    height:  10;
+   
 }
 
 .image-item:hover {
@@ -175,13 +179,17 @@ body {
 
 .image-item img {
     width: 100%;
-    height: 200px;
-    object-fit: cover; /* Ensure images maintain aspect ratio */
+    height: 350px;
+    object-fit: cover; /* Ensuring images maintain aspect ratio */
+   
 }
 
 .item-details {
     padding: 20px;
     background: rgba(255, 255, 255, 0.5);
+    position :absolute;
+    bottom: 0;
+    width : 100%;
 }
 
 .item-details h4.name {
@@ -210,18 +218,21 @@ body {
     font-size: 16px;
     color: #2C8E9B;
     transition: background-color 0.3s, color 0.3s;
+    border-radius: 50%; /* Make the button circular */
+    width: 30px; /* fixed width for circular shape */
+    height: 30px; /* fixed height for circular shape */
 }
 
 .pagination button:hover {
     background-color: #1B95B5;
     color: white;
-    border-radius: 5px;
+    border-radius: 50%;
 }
 
 .pagination button.active {
     background-color: #2C8E9B;
     color: white;
-    border-radius: 5px;
+    border-radius: 50%;
 }
 
 .pagination button:disabled {
