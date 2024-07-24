@@ -1,11 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import Login from './components/Login';
-import Home from './components/home';
-import Register from './components/Register';
-import ResetPassword from './components/ResetPassword';
+import Login from './components/Login/Login';
+import Home from './components/Home/home';
+import Register from './components/Register/Register';
+import ResetPassword from './components/ResetPassword/ResetPassword';
 import '@fortawesome/fontawesome-free/css/all.min.css'; // Import Font Awesome
-import ForgotPassword from './components/ForgotPassword';
+import ForgotPassword from './components/ForgotPassword/ForgotPassword';
+import Logout from './components/Logout/logout';
 import axios from "axios";
 
 
@@ -20,7 +21,8 @@ function App() {
           <Route path="/Register" element={<Register />} />
           <Route path="/reset-password" element={< ResetPassword />} />
           <Route path="/ForgotPassword" element={< ForgotPassword />} />
-          {/* Add more routes here if needed */}
+          <Route path="/logout" element={<Logout />} />
+          {/* Add more routes here  */}
           <Route path="/" element={<Navigate replace to="/login" />} />
         </Routes>
       </div>

@@ -5,8 +5,6 @@ import facebookIcon from '/src/assets/icons7.png';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-
-
 function Register() {
   const [formData, setFormData] = useState({
     fullName: '',
@@ -56,9 +54,9 @@ function Register() {
     } catch (error) {
       console.error('Error registering:', error);
       if (error.response) {
-        setError(`Registration failed: ${error.response.data.message || error.response.statusText}`);
+        setError(`A user with this email address already exists!`);
       } else if (error.request) {
-        setError('Registration failed: No response from server. Please try again later.');
+        setError('A user with this username already exists!');
       } else {
         setError(`Registration failed: ${error.message}`);
       }
@@ -72,7 +70,7 @@ function Register() {
         <p></p>
         {error && <p className="error-message">{error}</p>} {/* Display error message */}
         <form onSubmit={handleSubmit}>
-          <div className="input-group">
+          <div className="registration-input-group">
             <label htmlFor="fullName">Full Name</label>
             <input 
               type="text" 
@@ -83,7 +81,7 @@ function Register() {
               onChange={handleChange} 
             />
           </div>
-          <div className="input-group">
+          <div className="registration-input-group">
             <label htmlFor="email">Email Address</label>
             <input 
               type="email" 
@@ -94,7 +92,7 @@ function Register() {
               onChange={handleChange} 
             />
           </div>
-          <div className="input-group">
+          <div className="registration-input-group">
             <label htmlFor="password">Password</label>
             <input 
               type="password" 
@@ -105,7 +103,7 @@ function Register() {
               onChange={handleChange} 
             />
           </div>
-          <div className="input-group">
+          <div className="registration-input-group">
             <label htmlFor="confirmPassword">Confirm Password</label>
             <input 
               type="password" 

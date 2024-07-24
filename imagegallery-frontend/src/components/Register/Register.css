@@ -1,0 +1,182 @@
+/* Register.css */
+.register-container {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  font-family: 'Arial', 'Poppins';
+}
+
+.form-section {
+  flex: 1;
+  padding: 50px;
+  background-color: #FFFFFF;
+  /* Light grey background */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+h1 {
+  margin-right: 130px; /* Adjust as needed */
+  text-align: left;
+  font-size: 32px;
+  color:  #0F3C4C;
+  width: 263px;
+  height: 68px;
+  top: 135px;
+  padding: 10px 0px 0px 0px;
+  gap: 10px;
+  opacity: 0px;
+  margin-bottom: 20px;
+  font-weight: bold;
+  left: 3000px;
+  top: 1px;
+  font-family: 'Poppins'
+}
+
+p {
+  color: #666;
+  /* Medium grey text color */
+  font-size: 20px;
+  width: Hug (35px)px;
+  height: Hug (37px)px;
+  top: 651px;
+  left: 251px;
+  padding: 10px 0px 0px 0px;
+  gap: 10px;
+  opacity: 0px;
+}
+
+
+
+form {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.registration-input-group {
+  margin-bottom: 20px;
+}
+
+.registration-input-group label {
+  display: block;
+  font-size: 14px;
+  color: #2187AB;
+  margin-bottom: 5px;
+  font: bold;
+  font-weight: 10px;
+  font-size: large;
+}
+
+.registration-input-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.register-button {
+  padding: 15px;
+  border: none;
+  border-radius: 4px;
+  background-color: #2187AB;
+  /* Bootstrap primary blue */
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.register-button:hover {
+  background-color: #0056b3;
+  /* Darker blue on hover */
+}
+
+.social-login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.social-login p {
+  margin: 20px 0;
+}
+
+.google-btn,
+.facebook-btn {
+  width: 400px;
+  height: 44px;
+  top: 708px;
+  left: 73px;
+  opacity: 0px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.google-btn img,
+.facebook-btn img {
+  margin-right: 10px;
+}
+
+.google-btn {
+  background-color: #FFFFFF;
+  /* Google blue */
+  color: #2187AB;
+}
+
+.google-btn:hover {
+  background-color:  #e9ebee;
+  /* Darker Google blue on hover */
+}
+
+
+.facebook-btn {
+  background-color: #FFFFFF;
+  ;
+  /* Facebook blue */
+  color: #2187AB;
+}
+
+.facebook-btn:hover {
+  background-color: #e9ebee;
+  /* Darker Facebook blue on hover */
+}
+
+.login-link {
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.login-link a {
+  color: #007bff;
+  /* Bootstrap primary blue */
+  text-decoration: none;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+.image-section {
+  width: 1300px;
+  top: 54px;
+  left: 540px;
+  gap: 0px;
+  border-radius: 4px 0px 0px 0px;
+  opacity: 0px;
+  background: url('/src/assets/image-gallery.jpeg') no-repeat center center;
+  background-size: cover;
+}

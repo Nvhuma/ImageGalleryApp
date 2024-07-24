@@ -44,13 +44,50 @@ namespace api.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.UserName.ToLower());
+            var user = await _userManager.FindByNameAsync(loginDto.UserName.ToLower());
 
-            if (user == null) return Unauthorized("Invalid username!");
+            if (user == null) return Unauthorized("Invalid username or password");
 
-            var result = await _signinmanager.CheckPasswordSignInAsync(user, loginDto.Password, false);
+            // Check if account is locked
+            if (await _userManager.IsLockedOutAsync(user))
+            {
+                var lockoutEndDate = await _userManager.GetLockoutEndDateAsync(user);
+                var remainingLockoutTime = lockoutEndDate?.Subtract(DateTimeOffset.UtcNow);
 
-            if (!result.Succeeded) return Unauthorized("USERNAME NOT FOUND AND/OR PASSWORD INCORRECT!");
+                return Unauthorized(new
+                {
+                    Message = "Account is locked due to multiple failed login attempts.",
+                    LockoutEnd = lockoutEndDate?.UtcDateTime,
+                    RemainingLockoutTime = remainingLockoutTime?.TotalSeconds
+                });
+            }
+
+            var result = await _signinmanager.CheckPasswordSignInAsync(user, loginDto.Password, true);
+
+            if (!result.Succeeded)
+            {
+                // Increment access failed count
+                await _userManager.AccessFailedAsync(user);
+
+                // Check if the account is now locked
+                if (await _userManager.IsLockedOutAsync(user))
+                {
+                    var lockoutEndDate = await _userManager.GetLockoutEndDateAsync(user);
+                    var remainingLockoutTime = lockoutEndDate?.Subtract(DateTimeOffset.UtcNow);
+
+                    return Unauthorized(new
+                    {
+                        Message = "Account is locked due to multiple failed login attempts.",
+                        LockoutEnd = lockoutEndDate?.UtcDateTime,
+                        RemainingLockoutTime = remainingLockoutTime?.TotalSeconds
+                    });
+                }
+
+                return Unauthorized("Invalid username or password");
+            }
+
+            // Reset access failed count on successful login
+            await _userManager.ResetAccessFailedCountAsync(user);
 
             return Ok(
                 new NewUserDto
@@ -69,6 +106,20 @@ namespace api.Controllers
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
+
+                // Check if a user with the given email or username already exists
+                var existingUserByEmail = await _userManager.FindByEmailAsync(registerDto.EmailAddress);
+                var existingUserByUsername = await _userManager.FindByNameAsync(registerDto.UserName);
+
+                if (existingUserByEmail != null)
+                {
+                    return BadRequest("A user with this email address already exists.");
+                }
+
+                if (existingUserByUsername != null)
+                {
+                    return BadRequest("A user with this username already exists.");
+                }
 
                 var appUser = new AppUser
                 {
@@ -162,7 +213,7 @@ namespace api.Controllers
             // var resetLink = Url.Action("ResetPassword", "Account", new{token = resetToken, email = forgotPasswordDto.Email}, Request.Scheme);
             var resetLink = $"http://localhost:5173/reset-password?Email={forgotPasswordDto.Email}&token={Uri.EscapeDataString(resetToken)}";
 
-            await _emailService.SendEmailAsync(user.Email, "Reset Password Image Gallery", $"Please reset your password by clicking on this link: {resetLink}");
+            await _emailService.SendEmailAsync(user.Email, "Reset Password Image Gallery", $" Dear  Please reset your password by clicking on this link: {resetLink}");
 
             return Ok("Password reset link has been sent to your email.");
         }
@@ -171,6 +222,7 @@ namespace api.Controllers
         {
             //  generate a reset link
             //  a link to a page on your frontend that accepts the token and allows password reset
+
             return $"http://localhost:5173/reset-password?userId={userId}&token={Uri.EscapeDataString(token)}";
 
 
@@ -200,7 +252,7 @@ namespace api.Controllers
             {
                 From = new MailAddress(SmtpFrom),
                 Subject = "Password Reset Request",
-                Body = $"Please reset your password by clicking on this link: {resetLink}",
+                Body = $" Dear Please reset your password by clicking on this link: {resetLink}",
                 IsBodyHtml = true
             };
 
@@ -243,14 +295,40 @@ namespace api.Controllers
             }
         }
 
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {
+                // Sign out the user
+                await _signinmanager.SignOutAsync();
+                // Additional token revocation logic if needed
+                return Ok(new { message = "User logged out successfully." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Logout failed");
+                return StatusCode(500, new { message = "Logout failed." });
+            }
+        }
 
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPasswordDto resetPasswordDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
             if (user == null)
             {
                 return BadRequest(new { message = "Invalid email address." });
+            }
+
+            if (resetPasswordDto.NewPassword != resetPasswordDto.ConfirmPassword)
+            {
+                return BadRequest(new { message = "The new password and confirmation password do not match." });
             }
 
             var resetPassResult = await _userManager.ResetPasswordAsync(user, resetPasswordDto.Token, resetPasswordDto.NewPassword);

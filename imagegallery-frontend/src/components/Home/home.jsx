@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaHome, FaUpload, FaSignOutAlt } from 'react-icons/fa';
 import { MdSearch, MdFilterList } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import axios from 'axios';
 import './home.css';
 
@@ -9,11 +10,8 @@ const Home = () => {
   const totalPages = 3; // Example total number of pages
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
-  const imageItems = document.querySelectorAll('.image-item');
-  if (imageItems.length === 1) {
-      imageItems[0].classList.add('single');
-  }
-  
+  const navigate = useNavigate(); // Initialize useNavigate
+
   useEffect(() => {
     const fetchImages = async () => {
       try {
@@ -39,6 +37,15 @@ const Home = () => {
     currentPage * 4
   );
 
+  const handleLogout = async () => {
+    try {
+      await axios.post('http://localhost:5263/api/Account/logout');
+      navigate('/logout');  // Navigate to the logout page after logout
+    } catch (error) {
+      console.error('Logout failed', error);
+    }
+  };
+
   return (
     <div className="container">
       <div className="sidebar">
@@ -58,6 +65,7 @@ const Home = () => {
         <div className="logout">
           <FaSignOutAlt />
           <span>Logout</span>
+          <button onClick={handleLogout}>Logout</button>
         </div>
       </div>
       <div className="content">

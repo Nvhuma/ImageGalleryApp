@@ -8,7 +8,7 @@ namespace api.Dtos.Account
 {
     public class  ResetPasswordDto
     {
-      [Required]
+      //[Required]
     public string Token { get; set; }
 
      [Required]
@@ -16,7 +16,11 @@ namespace api.Dtos.Account
      public string Email { get; set; }
 
     [Required]
-    [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters long.")]
+    [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 15 characters long.")]
     public string NewPassword { get; set; }
+
+    [Required]
+    [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
+    public string ConfirmPassword { get; set; }
     }
 }
