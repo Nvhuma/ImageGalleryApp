@@ -1078,6 +1078,24 @@
           }
         }
       },
+      "Otp.NET/1.4.0": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/Otp.NET.dll": {}
+        },
+        "runtime": {
+          "lib/net8.0/Otp.NET.dll": {}
+        }
+      },
+      "QRCoder/1.6.0": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/QRCoder.dll": {}
+        },
+        "runtime": {
+          "lib/net6.0/QRCoder.dll": {}
+        }
+      },
       "Swashbuckle.AspNetCore/6.4.0": {
         "type": "package",
         "dependencies": {
@@ -3572,6 +3590,47 @@
         "newtonsoft.json.bson.nuspec"
       ]
     },
+    "Otp.NET/1.4.0": {
+      "sha512": "Fk1NKc0lWmlo6LAFYpFJInRgFKt72knRNEvxndDYoQHFwYOPXav+WEUBvQA0k4lxq5xt0SymrZ+oi0F/G40bPQ==",
+      "type": "package",
+      "path": "otp.net/1.4.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.txt",
+        "README.md",
+        "icon.png",
+        "lib/net461/Otp.NET.dll",
+        "lib/net5.0/Otp.NET.dll",
+        "lib/net6.0/Otp.NET.dll",
+        "lib/net7.0/Otp.NET.dll",
+        "lib/net8.0/Otp.NET.dll",
+        "lib/netstandard2.0/Otp.NET.dll",
+        "otp.net.1.4.0.nupkg.sha512",
+        "otp.net.nuspec"
+      ]
+    },
+    "QRCoder/1.6.0": {
+      "sha512": "XmPA81eo+oRxBuyVdswsSkTGTE1d3thfF11Z1PdD7oB56A6HU4G4AAOdySmGRMb/cljwlFTMWUtosGEnwpS6GA==",
+      "type": "package",
+      "path": "qrcoder/1.6.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net35/QRCoder.dll",
+        "lib/net40/QRCoder.dll",
+        "lib/net5.0-windows7.0/QRCoder.dll",
+        "lib/net5.0/QRCoder.dll",
+        "lib/net6.0-windows7.0/QRCoder.dll",
+        "lib/net6.0/QRCoder.dll",
+        "lib/netstandard1.3/QRCoder.dll",
+        "lib/netstandard2.0/QRCoder.dll",
+        "nuget-icon.png",
+        "nuget-readme.md",
+        "qrcoder.1.6.0.nupkg.sha512",
+        "qrcoder.nuspec"
+      ]
+    },
     "Swashbuckle.AspNetCore/6.4.0": {
       "sha512": "eUBr4TW0up6oKDA5Xwkul289uqSMgY0xGN4pnbOIBqCcN9VKGGaPvHX3vWaG/hvocfGDP+MGzMA0bBBKz2fkmQ==",
       "type": "package",
@@ -4678,6 +4737,8 @@
       "Microsoft.EntityFrameworkCore.Tools >= 8.0.6",
       "Microsoft.Extensions.Identity.Core >= 8.0.6",
       "Newtonsoft.Json >= 13.0.3",
+      "Otp.Net >= 1.4.0",
+      "QRCoder >= 1.6.0",
       "Swashbuckle.AspNetCore >= 6.4.0"
     ]
   },
@@ -4688,11 +4749,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\NBvuma\\ImageGalleryAPP\\api\\api.csproj",
+      "projectUniqueName": "C:\\Users\\NBvuma\\ImageGalleryAPP\\api\\api.csproj",
       "projectName": "api",
-      "projectPath": "c:\\Users\\NBvuma\\ImageGalleryAPP\\api\\api.csproj",
+      "projectPath": "C:\\Users\\NBvuma\\ImageGalleryAPP\\api\\api.csproj",
       "packagesPath": "C:\\Users\\NBvuma\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\NBvuma\\ImageGalleryAPP\\api\\obj\\",
+      "outputPath": "C:\\Users\\NBvuma\\ImageGalleryAPP\\api\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -4770,6 +4831,14 @@
           "Newtonsoft.Json": {
             "target": "Package",
             "version": "[13.0.3, )"
+          },
+          "Otp.Net": {
+            "target": "Package",
+            "version": "[1.4.0, )"
+          },
+          "QRCoder": {
+            "target": "Package",
+            "version": "[1.6.0, )"
           },
           "Swashbuckle.AspNetCore": {
             "target": "Package",

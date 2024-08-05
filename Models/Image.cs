@@ -13,11 +13,14 @@ namespace api.Models
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
 
-        public DateTime CreatedDate { get; set; }
-        public int UserId { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
 
-        //nav properties 
+        public DateTime LastUpdated { get; set;} =  DateTime.Now;
+        public string ImageURL {get; set;}
+        public string UserId { get; set; } // FOREING KEY TO USE 
          
+
+         // Navigation properties
         public AppUser AppUser { get; set; }
 
          public List<Comment> Comments { get; set; } = new List<Comment>(); // Comments on the image

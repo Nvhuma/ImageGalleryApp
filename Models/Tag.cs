@@ -14,6 +14,6 @@ namespace api.Models
 
 
         // Navigation properties
-        public List<ImageTag> ImageTags { get; set; } = new List<ImageTag>(); // Images associated with the tag
+        public List<ImageTag> ImageTags { get; set; }  // Images associated with the tag
     }
 }

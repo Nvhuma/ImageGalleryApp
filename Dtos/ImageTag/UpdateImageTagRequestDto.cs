@@ -9,9 +9,13 @@ namespace api.Dtos.ImageTag
     public class UpdateImageTagRequestDto
     {
         [Required]
+
+          public int ImageTagID { get; set; }
+        
+        [Required]
           public int ImageId { get; set; }
 
-          [Required]
+        [Required]
           public int TagId { get; set; }
     }
 }

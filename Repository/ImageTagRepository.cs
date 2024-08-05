@@ -31,7 +31,7 @@ namespace api.Repository
 
         public async Task<ImageTag?> DeleteAsync(int id)
         {
-            var imageTagModel = await _context.ImageTags.FirstOrDefaultAsync(x => x.TagId == id);
+            var imageTagModel = await _context.ImageTags.FirstOrDefaultAsync(x => x.ImageTagID == id);
 
             if(imageTagModel == null)
             {
@@ -43,32 +43,70 @@ namespace api.Repository
             return imageTagModel;
         }
 
-        public Task<List<ImageTag>> GetAllAsync(QueryObject query)
+        public async Task<List<ImageTag>> GetAllAsync(QueryObject query)
+
         {
-            throw new NotImplementedException();
+            // Create a queryable list of image tags from the database.
+        var imageTags = _context.ImageTags.AsQueryable();
+
+           // Check if the query's ImageId is not null and not the default value (0).
+        if (!IsNullOrDefault(query.ImageTagID))
+        {
+            // If ImageId is valid, filter the image tags to include only those with the specified ImageId.
+            imageTags = imageTags.Where(it => it.ImageId == query.ImageTagID);
+        }
+            // Convert the filtered queryable list to a List<ImageTag> and return it asynchronously.
+        return await imageTags.ToListAsync();
         }
 
-        // public  async Task<List<ImageTag>> GetAllAsync(QueryObject query)
-        // {
-        //       var imageTags await _context.ImageTags.AsQueryable();
+        private bool IsNullOrDefault(int? ImageTagID)
+        {
+             // Check if the nullable integer 'imageId' is either null or the default value (0).
+             // Return true if it is null or 0, otherwise return false.
+          return !ImageTagID.HasValue || ImageTagID.Value == default(int);
+        }
 
+
+        // {
+        //     var imageTags =  _context.ImageTags.Include(it => it.ImageId).AsQueryable();
+
+        //     if(!int.IsNullOrWhiteSpace(query.ImageId))
+        //     {
+        //         imageTags = imageTags.Where(it => it.ImageId.Contains(query.ImageId));
+        //     }
+
+        //     if(!int.IsNullOrWhiteSpace(query.ImageId))
+        //     {
+        //         imageTags = imageTags.Where(it => it.ImageId.Contains(query));
+        //     }
+
+        //     return await imageTags.ToListAsync();
         // }
 
-        public async Task<ImageTag?> GetByIdAsync(int id)
+
+
+
+
+
+
+        public async Task<ImageTag?> GetByIdAsync(int ImageTagID)
         {
-            return  await _context.ImageTags.FindAsync(id);
+            return  await _context.ImageTags.FindAsync( ImageTagID);
         }
             
 
         public async Task<ImageTag?> UpdateAsync(int id, UpdateImageTagRequestDto ImageTagDto)
         {
-            var existingImageTag = await _context.ImageTags.FirstOrDefaultAsync(x => x.TagId == id);
+            var existingImageTag = await _context.ImageTags.FirstOrDefaultAsync(x => x.ImageTagID == id);
 
             if(existingImageTag == null)
             {
                 return null;
             }
-               existingImageTag.ImageId =  ImageTagDto.ImageId;
+
+             existingImageTag.ImageTagID =  ImageTagDto.ImageTagID;
+
+              existingImageTag.ImageId =  ImageTagDto.ImageId;
             existingImageTag.TagId =  ImageTagDto.TagId;
             
             await _context.SaveChangesAsync();
