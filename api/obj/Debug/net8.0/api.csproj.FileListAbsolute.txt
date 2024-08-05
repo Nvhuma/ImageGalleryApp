@@ -149,3 +149,5 @@ C:\Users\NBvuma\ImageGalleryAPP\api\obj\Debug\net8.0\api.genruntimeconfig.cache
 C:\Users\NBvuma\ImageGalleryAPP\api\obj\Debug\net8.0\ref\api.dll
 C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\package-lock.json
 C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\package.json
+C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\Otp.NET.dll
+C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\QRCoder.dll

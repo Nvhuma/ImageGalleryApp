@@ -20,7 +20,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 
-// Add configuration sources
+// Adding configuration sources
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true);
 builder.Configuration.AddEnvironmentVariables();
@@ -29,7 +29,7 @@ builder.Configuration.AddEnvironmentVariables();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
-        builder => builder.WithOrigins("http://localhost:5173") // Your React app's URL
+        builder => builder.WithOrigins("http://localhost:5173") // React app's URL
                           .AllowAnyHeader()
                           .AllowAnyMethod());
 });
@@ -41,7 +41,7 @@ builder.Services.AddSwaggerGen(option =>
 {
     option.SwaggerDoc("v1", new OpenApiInfo { Title = "ImageGallery API", Version = "v1" });
 
-    // Add JWT security definition in Swagger
+    // Adding JWT security definition in Swagger
     option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -52,7 +52,7 @@ builder.Services.AddSwaggerGen(option =>
         Scheme = "Bearer"
     });
 
-    // Apply security to all endpoints in Swagger
+    // Applying security to all endpoints in Swagger
     option.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -70,37 +70,44 @@ builder.Services.AddSwaggerGen(option =>
 });
 
 // Database Context configuration using SQL Server
-builder.Services.AddControllers().AddNewtonsoftJson(options =>{
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+{
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 });
 
 // Identity configuration for AppUser and roles
-builder.Services.AddDbContext<ApplicationDBContext>(options =>{
-     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+builder.Services.AddDbContext<ApplicationDBContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-builder.Services.AddIdentity<AppUser, IdentityRole>(options => 
+builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
     options.Password.RequireUppercase = true;
     options.Password.RequireNonAlphanumeric = true;
     options.Password.RequiredLength = 15;
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(2);
     options.Lockout.MaxFailedAccessAttempts = 3;
     options.Lockout.AllowedForNewUsers = true;
+
+    options.SignIn.RequireConfirmedEmail = true;
+
 })
 .AddEntityFrameworkStores<ApplicationDBContext>()
-.AddDefaultTokenProviders(); // Ensure this line is present
+.AddDefaultTokenProviders(); 
 
 // JWT Authentication configuration
-builder.Services.AddAuthentication(options => {
- options.DefaultAuthenticateScheme =JwtBearerDefaults.AuthenticationScheme;
- options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
- options.DefaultForbidScheme = JwtBearerDefaults.AuthenticationScheme;
- options.DefaultScheme =JwtBearerDefaults.AuthenticationScheme;
- options.DefaultSignInScheme =JwtBearerDefaults.AuthenticationScheme;
- options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultForbidScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
 
 }).AddJwtBearer(options =>
 {
@@ -123,34 +130,34 @@ builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IImageRepository, ImageRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IEmailService, EmailService>(); 
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddLogging();
 
 
 var app = builder.Build();
 
 
-// Configure the HTTP request pipeline.
+// Configurig the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// Enable CORS for the specified policy
+// Enabling CORS for the specified policy
 app.UseCors("AllowReactApp");
 
 // Redirect HTTP requests to HTTPS
 app.UseHttpsRedirection();
 
-// Use authentication middleware
+//  authentication middleware
 app.UseAuthentication();
 
-// Use authorization middleware
+
 app.UseAuthorization();
 
-// Map controller routes
+// controller routes
 app.MapControllers();
 
-// Run the application
+
 app.Run();

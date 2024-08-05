@@ -51,13 +51,13 @@ namespace api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "51e527a4-b894-4bf6-a68e-1b55ddcb322a",
+                            Id = "37372130-7908-4a88-926f-7eb770d1886d",
                             Name = "Admin",
                             NormalizedName = "Admin"
                         },
                         new
                         {
-                            Id = "57fa8633-e7aa-4ebf-80e4-cdf9c899049e",
+                            Id = "b1b82534-4f65-41c7-baa9-c21259a3a662",
                             Name = "User",
                             NormalizedName = "User"
                         });
@@ -218,6 +218,10 @@ namespace api.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("TotpSecret")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
@@ -356,6 +360,32 @@ namespace api.Migrations
                     b.ToTable("Tags");
                 });
 
+            modelBuilder.Entity("api.Models.UserPasswordHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AppUserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppUserID");
+
+                    b.ToTable("UserPasswordHistory");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -454,11 +484,24 @@ namespace api.Migrations
                     b.Navigation("Tag");
                 });
 
+            modelBuilder.Entity("api.Models.UserPasswordHistory", b =>
+                {
+                    b.HasOne("api.Models.AppUser", "AppUser")
+                        .WithMany("UserPasswordHistories")
+                        .HasForeignKey("AppUserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AppUser");
+                });
+
             modelBuilder.Entity("api.Models.AppUser", b =>
                 {
                     b.Navigation("Comments");
 
                     b.Navigation("Images");
+
+                    b.Navigation("UserPasswordHistories");
                 });
 
             modelBuilder.Entity("api.Models.Image", b =>

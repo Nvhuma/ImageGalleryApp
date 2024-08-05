@@ -21,6 +21,9 @@ namespace api.Data
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Image> Images { get; set; }
         public DbSet<ImageTag> ImageTags { get; set; }
+        public DbSet<UserPasswordHistory> UserPasswordHistory { get; set; }
+        
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -45,6 +48,13 @@ namespace api.Data
             modelBuilder.Entity<AppUser>()
                    .Property(u => u.Id)
                    .HasColumnName("UserID");
+
+              
+
+                 modelBuilder.Entity<UserPasswordHistory>()
+                .HasOne(uph => uph.AppUser)
+                .WithMany(u => u.UserPasswordHistories)
+                .HasForeignKey(uph => uph.AppUserID);
 
             modelBuilder.Entity<Image>()
                 .HasOne(i => i.AppUser)

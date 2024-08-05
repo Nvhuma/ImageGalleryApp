@@ -10,13 +10,13 @@ namespace api.Dtos.Image
     public class CreateImageRequestDto
     {
         [Required]
-        [MinLength(5,  ErrorMessage = "title must be more 5 characters")]
-        [MaxLength(10000000, ErrorMessage = "title cannot be over 10000000 characters")]
+        [MinLength(2,  ErrorMessage = "title must be more 5 characters")]
+        [MaxLength(50, ErrorMessage = "title cannot be over 10000000 characters")]
         public string Title { get; set; } = string.Empty;
 
          [Required]
         [MinLength(5,  ErrorMessage = "title must be 5 characters")]
-        [MaxLength(10000000, ErrorMessage = "title cannot be over 10000000 characters")]
+        [MaxLength(50, ErrorMessage = "title cannot be over 10000000 characters")]
         public string Description { get; set; } = string.Empty;
 
        // public List<CommentDto> Comments (get; set;)
@@ -25,8 +25,7 @@ namespace api.Dtos.Image
         [Required]
         public DateTime CreatedDate { get; set; }
 
-         
-        // [Required]
-        // public string UserId { get; set; }
+        public IFormFile Image { get; set; } // For file upload
+        
     }
 }

@@ -30,15 +30,13 @@ const LogoutPage = () => {
   return (
     <div className="container">
       <div className="sidebar">
-        <h1>Logo</h1>
+      <img src="\src\assets\GAEL.svg" alt="Logo" className="sidebar-logo" />
         <nav>
-          <a href="/home">Home</a>
-          <a href="/upload">Image Upload</a>
         </nav>
       </div>
       <div className="main-content">
         <div className="logout-message">
-          <h2>Logo</h2>
+        <img src="\src\assets\GAEL.svg" alt="Logo" className="message-logo" />
           <p>You have successfully logged out</p>
           <button onClick={handleBackToLogin}>Back to Login</button>
         </div>

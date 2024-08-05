@@ -7,7 +7,7 @@
 namespace api.Migrations
 {
     /// <inheritdoc />
-    public partial class AddCreatedByToComments : Migration
+    public partial class AddUserPasswordHistory : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,27 +15,20 @@ namespace api.Migrations
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "53754eb6-a29c-476f-9407-b31854fc66f7");
+                keyValue: "592a6469-4407-4049-9ec7-b0afc19da3d1");
 
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "e6716419-0c63-4a15-a213-b9b25e10644e");
-
-            migrationBuilder.AddColumn<string>(
-                name: "CreatedBy",
-                table: "Comments",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "");
+                keyValue: "7c0c4390-345e-4e17-9314-0ba83b8d6d6d");
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "51e527a4-b894-4bf6-a68e-1b55ddcb322a", null, "Admin", "Admin" },
-                    { "57fa8633-e7aa-4ebf-80e4-cdf9c899049e", null, "User", "User" }
+                    { "8a57514e-d0fc-44d4-a8d3-260bb3acba90", null, "Admin", "Admin" },
+                    { "d7af7019-7062-4bcf-b56d-9b0071b66a38", null, "User", "User" }
                 });
         }
 
@@ -45,24 +38,20 @@ namespace api.Migrations
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "51e527a4-b894-4bf6-a68e-1b55ddcb322a");
+                keyValue: "8a57514e-d0fc-44d4-a8d3-260bb3acba90");
 
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "57fa8633-e7aa-4ebf-80e4-cdf9c899049e");
-
-            migrationBuilder.DropColumn(
-                name: "CreatedBy",
-                table: "Comments");
+                keyValue: "d7af7019-7062-4bcf-b56d-9b0071b66a38");
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "53754eb6-a29c-476f-9407-b31854fc66f7", null, "User", "User" },
-                    { "e6716419-0c63-4a15-a213-b9b25e10644e", null, "Admin", "Admin" }
+                    { "592a6469-4407-4049-9ec7-b0afc19da3d1", null, "Admin", "Admin" },
+                    { "7c0c4390-345e-4e17-9314-0ba83b8d6d6d", null, "User", "User" }
                 });
         }
     }

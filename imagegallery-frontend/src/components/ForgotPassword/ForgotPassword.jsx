@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import './ForgotPassword.css';
 
 function ForgotPassword() {
@@ -30,17 +31,21 @@ function ForgotPassword() {
     return (
         <div className="forgot-password-container">
             <div className="forgot-password-box">
-                <h2>Forgot Password</h2>
+                <h2>Recover Password</h2>
                 <form onSubmit={handleSubmit}>
-                    <label>Email:</label>
+                    <label> Email Address</label>
                     <input 
                         type="email" 
                         value={email} 
+                        placeholder="Enter Email"
                         onChange={(e) => setEmail(e.target.value)} 
                         required 
                     />
+                    <p className="login-link">
+                        <Link to="/login">Back to Login</Link>
+                    </p>
                     <button type="submit" disabled={loading}>
-                        {loading ? 'Sending...' : 'Send Reset Link'}
+                        {loading ? 'Sending...' : 'Recover Password'}
                     </button>
                 </form>
                 {message && <p>{message}</p>}

@@ -90,6 +90,14 @@
               "target": "Package",
               "version": "[13.0.3, )"
             },
+            "Otp.Net": {
+              "target": "Package",
+              "version": "[1.4.0, )"
+            },
+            "QRCoder": {
+              "target": "Package",
+              "version": "[1.6.0, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.4.0, )"

@@ -1,54 +1,34 @@
-/* Register.css */
 .register-container {
   display: flex;
   flex-direction: row;
   height: 100vh;
-  font-family: 'Arial', 'Poppins';
+  font-family: 'Arial', 'Poppins', sans-serif;
 }
 
 .form-section {
   flex: 1;
   padding: 50px;
   background-color: #FFFFFF;
-  /* Light grey background */
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
 }
 
 h1 {
-  margin-right: 130px; /* Adjust as needed */
+  margin-bottom: 20px;
   text-align: left;
   font-size: 32px;
-  color:  #0F3C4C;
-  width: 263px;
-  height: 68px;
-  top: 135px;
-  padding: 10px 0px 0px 0px;
-  gap: 10px;
-  opacity: 0px;
-  margin-bottom: 20px;
+  color: #0F3C4C;
   font-weight: bold;
-  left: 3000px;
-  top: 1px;
-  font-family: 'Poppins'
+  font-family: 'Poppins', sans-serif;
 }
 
 p {
   color: #666;
-  /* Medium grey text color */
-  font-size: 20px;
-  width: Hug (35px)px;
-  height: Hug (37px)px;
-  top: 651px;
-  left: 251px;
-  padding: 10px 0px 0px 0px;
-  gap: 10px;
-  opacity: 0px;
+  font-size: 14px;
+  margin-bottom: 20px;
 }
-
-
 
 form {
   width: 100%;
@@ -59,16 +39,17 @@ form {
 
 .registration-input-group {
   margin-bottom: 20px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .registration-input-group label {
   display: block;
   font-size: 14px;
-  color: #2187AB;
+  color: #0F3C4C;
   margin-bottom: 5px;
-  font: bold;
-  font-weight: 10px;
-  font-size: large;
+  font-weight: bold;
 }
 
 .registration-input-group input {
@@ -84,16 +65,16 @@ form {
   border: none;
   border-radius: 4px;
   background-color: #2187AB;
-  /* Bootstrap primary blue */
   color: white;
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  width: 100%;
+  margin-top: 10px;
 }
 
 .register-button:hover {
   background-color: #0056b3;
-  /* Darker blue on hover */
 }
 
 .social-login {
@@ -104,16 +85,15 @@ form {
 }
 
 .social-login p {
-  margin: 20px 0;
+  margin: 25px 0;
+  font-weight: bold;
 }
 
 .google-btn,
 .facebook-btn {
-  width: 400px;
+  width: 100%;
+  max-width: 400px;
   height: 44px;
-  top: 708px;
-  left: 73px;
-  opacity: 0px;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -133,36 +113,35 @@ form {
 
 .google-btn {
   background-color: #FFFFFF;
-  /* Google blue */
-  color: #2187AB;
+  color: #0F3C4C;
+  font-weight: bold;
+  font-family: 'Poppins';
 }
 
 .google-btn:hover {
-  background-color:  #e9ebee;
-  /* Darker Google blue on hover */
+  background-color: #e9ebee;
 }
-
 
 .facebook-btn {
   background-color: #FFFFFF;
-  ;
-  /* Facebook blue */
-  color: #2187AB;
+  color: #0F3C4C;
+  font-weight: bold;
+  font-family: 'Poppins';
 }
 
 .facebook-btn:hover {
   background-color: #e9ebee;
-  /* Darker Facebook blue on hover */
 }
 
 .login-link {
   margin-top: 20px;
   font-size: 14px;
+  text-align: center;
+  width: 100%;
 }
 
 .login-link a {
   color: #007bff;
-  /* Bootstrap primary blue */
   text-decoration: none;
 }
 
@@ -171,12 +150,27 @@ form {
 }
 
 .image-section {
-  width: 1300px;
-  top: 54px;
-  left: 540px;
-  gap: 0px;
-  border-radius: 4px 0px 0px 0px;
-  opacity: 0px;
+  flex: 1;
   background: url('/src/assets/image-gallery.jpeg') no-repeat center center;
   background-size: cover;
+  border-radius: 0px 4px 4px 0px;
+}
+
+.qr-code-container {
+  margin-top: 20px;
+  text-align: center;
+  padding: 20px; /* Add padding */
+}
+
+.qr-code-container img {
+  max-width: 400px;
+  height: auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.qr-code-container p {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #0F3C4C;
 }

@@ -12,8 +12,8 @@ using api.Data;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20240628103940_AddNamesToAspNetUsers")]
-    partial class AddNamesToAspNetUsers
+    [Migration("20240729105101_AddUserPasswordHistory")]
+    partial class AddUserPasswordHistory
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,13 +54,13 @@ namespace api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "e6716419-0c63-4a15-a213-b9b25e10644e",
+                            Id = "8a57514e-d0fc-44d4-a8d3-260bb3acba90",
                             Name = "Admin",
                             NormalizedName = "Admin"
                         },
                         new
                         {
-                            Id = "53754eb6-a29c-476f-9407-b31854fc66f7",
+                            Id = "d7af7019-7062-4bcf-b56d-9b0071b66a38",
                             Name = "User",
                             NormalizedName = "User"
                         });
@@ -253,6 +253,10 @@ namespace api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
@@ -355,6 +359,32 @@ namespace api.Migrations
                     b.ToTable("Tags");
                 });
 
+            modelBuilder.Entity("api.Models.UserPasswordHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AppUserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppUserID");
+
+                    b.ToTable("UserPasswordHistory");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -453,11 +483,24 @@ namespace api.Migrations
                     b.Navigation("Tag");
                 });
 
+            modelBuilder.Entity("api.Models.UserPasswordHistory", b =>
+                {
+                    b.HasOne("api.Models.AppUser", "AppUser")
+                        .WithMany("UserPasswordHistories")
+                        .HasForeignKey("AppUserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AppUser");
+                });
+
             modelBuilder.Entity("api.Models.AppUser", b =>
                 {
                     b.Navigation("Comments");
 
                     b.Navigation("Images");
+
+                    b.Navigation("UserPasswordHistories");
                 });
 
             modelBuilder.Entity("api.Models.Image", b =>

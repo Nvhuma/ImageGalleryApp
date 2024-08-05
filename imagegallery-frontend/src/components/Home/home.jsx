@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaHome, FaUpload, FaSignOutAlt } from 'react-icons/fa';
 import { MdSearch, MdFilterList } from 'react-icons/md';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './home.css';
 
@@ -10,9 +10,11 @@ const Home = () => {
   const totalPages = 3; // Example total number of pages
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate(); // Initialize useNavigate
+  const [username, setUsername] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
+    // Fetch images
     const fetchImages = async () => {
       try {
         const response = await axios.get('http://localhost:5263/api/image');
@@ -26,6 +28,12 @@ const Home = () => {
     };
 
     fetchImages();
+
+    // Get username from localStorage
+    const storedUsername = localStorage.getItem("username");
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
   }, []);
 
   const handlePageChange = (page) => {
@@ -33,14 +41,16 @@ const Home = () => {
   };
 
   const filteredImages = images.slice(
-    (currentPage - 1) * 4,
-    currentPage * 4
+    (currentPage - 1) * 6,
+    currentPage * 6
   );
 
   const handleLogout = async () => {
     try {
       await axios.post('http://localhost:5263/api/Account/logout');
-      navigate('/logout');  // Navigate to the logout page after logout
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      navigate('/logout');
     } catch (error) {
       console.error('Logout failed', error);
     }
@@ -50,29 +60,28 @@ const Home = () => {
     <div className="container">
       <div className="sidebar">
         <div className="logo-section">
-          <div className="logo">Logo</div>
+          <img src="\src\assets\GAEL.svg" alt="Logo" className="logo-img" />
         </div>
         <div className="menu">
           <div className="menu-item active">
             <FaHome />
             <span>Home</span>
           </div>
-          <div className="menu-item">
+          <div className="menu-item" onClick={() => navigate('/ImageUpload')}>
             <FaUpload />
             <span>Image Upload</span>
           </div>
         </div>
-        <div className="logout">
+        <div className="logout" onClick={handleLogout}>
           <FaSignOutAlt />
           <span>Logout</span>
-          <button onClick={handleLogout}>Logout</button>
         </div>
       </div>
       <div className="content">
         <div className="header">
           <h2>Home</h2>
           <div className="user">
-            <span>User</span>
+            <span>{username || "User"}</span>
             <img src="/src/assets/user.png" alt="User Avatar" />
           </div>
         </div>

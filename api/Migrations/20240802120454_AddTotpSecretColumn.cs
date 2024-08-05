@@ -7,7 +7,7 @@
 namespace api.Migrations
 {
     /// <inheritdoc />
-    public partial class AddNamesToAspNetUsers : Migration
+    public partial class AddTotpSecretColumn : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,28 +15,27 @@ namespace api.Migrations
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "2da8a137-c8f1-4211-b2f3-906a1f1c2618");
+                keyValue: "8a57514e-d0fc-44d4-a8d3-260bb3acba90");
 
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "ddff7312-d43d-4a75-a0c2-06a7169b880d");
+                keyValue: "d7af7019-7062-4bcf-b56d-9b0071b66a38");
 
-            migrationBuilder.AlterColumn<string>(
-                name: "Names",
+            migrationBuilder.AddColumn<string>(
+                name: "TotpSecret",
                 table: "AspNetUsers",
                 type: "nvarchar(max)",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
+                nullable: false,
+                defaultValue: "");
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "53754eb6-a29c-476f-9407-b31854fc66f7", null, "User", "User" },
-                    { "e6716419-0c63-4a15-a213-b9b25e10644e", null, "Admin", "Admin" }
+                    { "37372130-7908-4a88-926f-7eb770d1886d", null, "Admin", "Admin" },
+                    { "b1b82534-4f65-41c7-baa9-c21259a3a662", null, "User", "User" }
                 });
         }
 
@@ -46,30 +45,24 @@ namespace api.Migrations
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "53754eb6-a29c-476f-9407-b31854fc66f7");
+                keyValue: "37372130-7908-4a88-926f-7eb770d1886d");
 
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "e6716419-0c63-4a15-a213-b9b25e10644e");
+                keyValue: "b1b82534-4f65-41c7-baa9-c21259a3a662");
 
-            migrationBuilder.AlterColumn<string>(
-                name: "Names",
-                table: "AspNetUsers",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)",
-                oldNullable: true);
+            migrationBuilder.DropColumn(
+                name: "TotpSecret",
+                table: "AspNetUsers");
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "2da8a137-c8f1-4211-b2f3-906a1f1c2618", null, "User", "User" },
-                    { "ddff7312-d43d-4a75-a0c2-06a7169b880d", null, "Admin", "Admin" }
+                    { "8a57514e-d0fc-44d4-a8d3-260bb3acba90", null, "Admin", "Admin" },
+                    { "d7af7019-7062-4bcf-b56d-9b0071b66a38", null, "User", "User" }
                 });
         }
     }

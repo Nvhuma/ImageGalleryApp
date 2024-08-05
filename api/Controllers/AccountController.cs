@@ -6,6 +6,7 @@ using System.Net.Mail;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using System.Web;
+using api.Data;
 using api.Dtos.Account;
 using api.Interfaces;
 using api.Models;
@@ -13,6 +14,8 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OtpNet;
+using QRCoder;
 
 namespace api.Controllers
 {
@@ -20,15 +23,20 @@ namespace api.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
+        private readonly ApplicationDBContext _context;
         private readonly ITokenService _tokenService;
+
         private readonly UserManager<AppUser> _userManager;
+
         private readonly SignInManager<AppUser> _signinmanager;
+
         private readonly IEmailService _emailService;
+
         private readonly IConfiguration _configuration;
 
         private readonly ILogger<AccountController> _logger;
 
-        public AccountController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signinmanager, IEmailService emailService, ILogger<AccountController> logger, IConfiguration configuration)
+        public AccountController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signinmanager, IEmailService emailService, ILogger<AccountController> logger, IConfiguration configuration, ApplicationDBContext context)
         {
             _userManager = userManager;
             _tokenService = tokenService;
@@ -36,8 +44,11 @@ namespace api.Controllers
             _emailService = emailService;
             _logger = logger;
             _configuration = configuration;
+            _context = context;
 
         }
+
+
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto loginDto)
@@ -46,9 +57,10 @@ namespace api.Controllers
 
             var user = await _userManager.FindByNameAsync(loginDto.UserName.ToLower());
 
-            if (user == null) return Unauthorized("Invalid username or password");
+            if (user == null) return Unauthorized(new { Message = "Invalid username or password" });
 
-            // Check if account is locked
+            if (!user.EmailConfirmed) return Unauthorized(new { Message = "User email is not confirmed." });
+
             if (await _userManager.IsLockedOutAsync(user))
             {
                 var lockoutEndDate = await _userManager.GetLockoutEndDateAsync(user);
@@ -57,8 +69,7 @@ namespace api.Controllers
                 return Unauthorized(new
                 {
                     Message = "Account is locked due to multiple failed login attempts.",
-                    LockoutEnd = lockoutEndDate?.UtcDateTime,
-                    RemainingLockoutTime = remainingLockoutTime?.TotalSeconds
+                    remainingLockoutTime = remainingLockoutTime?.TotalSeconds
                 });
             }
 
@@ -66,10 +77,8 @@ namespace api.Controllers
 
             if (!result.Succeeded)
             {
-                // Increment access failed count
                 await _userManager.AccessFailedAsync(user);
 
-                // Check if the account is now locked
                 if (await _userManager.IsLockedOutAsync(user))
                 {
                     var lockoutEndDate = await _userManager.GetLockoutEndDateAsync(user);
@@ -78,122 +87,96 @@ namespace api.Controllers
                     return Unauthorized(new
                     {
                         Message = "Account is locked due to multiple failed login attempts.",
-                        LockoutEnd = lockoutEndDate?.UtcDateTime,
                         RemainingLockoutTime = remainingLockoutTime?.TotalSeconds
                     });
                 }
 
-                return Unauthorized("Invalid username or password");
+                return Unauthorized(new { Message = "Invalid username or password" });
             }
 
-            // Reset access failed count on successful login
+            // Verify TOTP code
+            var totp = new Totp(Base32Encoding.ToBytes(user.TotpSecret));
+            if (!totp.VerifyTotp(loginDto.TotpCode, out long timeStepMatched, new VerificationWindow(2, 2)))
+            {
+                return Unauthorized(new { Message = "Invalid TOTP code" });
+            }
+
+            // Update TwoFactorEnabled column after successful TOTP verification
+            if (!user.TwoFactorEnabled)
+            {
+                user.TwoFactorEnabled = true;
+                await _userManager.UpdateAsync(user);
+            }
+
             await _userManager.ResetAccessFailedCountAsync(user);
 
-            return Ok(
-                new NewUserDto
-                {
-                    UserName = user.UserName,
-                    EmailAddress = user.Email,
-                    token = _tokenService.CreateToken(user)
-                }
-            );
+            return Ok(new
+            {
+                UserName = user.UserName,
+                EmailAddress = user.Email,
+                token = _tokenService.CreateToken(user)
+            });
         }
 
+
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
+        public async Task<IActionResult> Register(RegisterDto registerDto)
         {
-            try
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var existingUserByEmail = await _userManager.FindByEmailAsync(registerDto.EmailAddress);
+            var existingUserByUsername = await _userManager.FindByNameAsync(registerDto.UserName);
+
+            if (existingUserByEmail != null)
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
-                // Check if a user with the given email or username already exists
-                var existingUserByEmail = await _userManager.FindByEmailAsync(registerDto.EmailAddress);
-                var existingUserByUsername = await _userManager.FindByNameAsync(registerDto.UserName);
-
-                if (existingUserByEmail != null)
-                {
-                    return BadRequest("A user with this email address already exists.");
-                }
-
-                if (existingUserByUsername != null)
-                {
-                    return BadRequest("A user with this username already exists.");
-                }
-
-                var appUser = new AppUser
-                {
-                    UserName = registerDto.UserName,
-                    Email = registerDto.EmailAddress,
-                    Names = registerDto.Names,
-                };
-
-                var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
-
-                if (createdUser.Succeeded)
-                {
-                    // Generate email confirmation token
-                    var emailConfirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
-                    var encodedToken = HttpUtility.UrlEncode(emailConfirmationToken);
-                    // Create the confirmation link
-                    var confirmationLink = Url.Action("ConfirmEmail", "Account",
-                        new { userId = appUser.Id, token = emailConfirmationToken }, Request.Scheme);
-
-                    // Send the confirmation email
-                    // (Assuming _emailSender is an instance of a service to send emails)
-                    var emailContent = $@"
-                    Please confirm your account by clicking this link: <a href='{confirmationLink}'>Confirm Email</a><br /><br />
-                    The information contained in this communication is confidential and may be legally privileged. It is intended solely for use by the originator and others authorised to receive it. If you are not that person you are hereby notified that any disclosure, copying, distribution or taking action in reliance of the contents of this information is strictly prohibited and may be unlawful. Neither Singular Systems (Pty) Ltd (Registration 2002/001492/07) nor any of its subsidiaries are liable for the proper, complete transmission of the information contained in this communication, or for any delay in its receipt, or for the assurance that it is virus-free. If you have received this in error please report it to: sis@singular.co.za, IT";
-
-                    await _emailService.SendEmailAsync(appUser.Email, "Confirm your email",
-                        $"Please confirm your account by clicking this link: <a href='{confirmationLink}'>link</a>");
-
-                    // Create the token
-                    var token = _tokenService.CreateToken(appUser);
-
-                    var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
-                    if (roleResult.Succeeded)
-                    {
-                        var AccessToken = _tokenService.CreateToken(appUser);
-
-                        // Populate AspNetUserTokens table
-                        var result = await _userManager.SetAuthenticationTokenAsync(
-                            appUser,
-                            "TokenProvider", //  can  Replace with token provider name
-                            "AccessToken", //   can use any name for the token
-                            token
-                        );
-
-                        if (result.Succeeded)
-                        {
-                            return Ok(
-                                new NewUserDto
-                                {
-                                    UserName = appUser.UserName,
-                                    EmailAddress = appUser.Email,
-                                    token = _tokenService.CreateToken(appUser)
-                                }
-                            );
-                        }
-                        else
-                        {
-                            return StatusCode(500, "Fallied to save token");
-                        }
-
-                    }
-                    else
-                    {
-                        return StatusCode(500, roleResult.Errors);
-                    }
-                }
-                else
-                {
-                    return StatusCode(500, createdUser.Errors);
-                }
+                return BadRequest(new { Message = "A user with this email address already exists." });
             }
-            catch (Exception e)
+
+            if (existingUserByUsername != null)
             {
-                return StatusCode(500, e);
+                return BadRequest(new { Message = "A user with this username already exists." });
+            }
+
+            var appUser = new AppUser
+            {
+                UserName = registerDto.UserName,
+                Email = registerDto.EmailAddress,
+                Names = registerDto.Names,
+            };
+
+            // Generate the TOTP secret key
+            var key = KeyGeneration.GenerateRandomKey(20);
+            var base32Secret = Base32Encoding.ToString(key);
+            appUser.TotpSecret = base32Secret;
+
+            var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
+
+            if (createdUser.Succeeded)
+            {
+                var emailConfirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
+                var encodedToken = HttpUtility.UrlEncode(emailConfirmationToken);
+                var confirmationLink = Url.Action("ConfirmEmail", "Account", new { userId = appUser.Id, token = emailConfirmationToken }, Request.Scheme);
+
+                var qrGenerator = new QRCodeGenerator();
+                var otpUri = $"otpauth://totp/Image Gallery App:{appUser.Email}?secret={base32Secret}&issuer=Image Gallery App";
+                var qrCodeData = qrGenerator.CreateQrCode(otpUri, QRCodeGenerator.ECCLevel.Q);
+                var qrCode = new Base64QRCode(qrCodeData).GetGraphic(20);
+
+                await _emailService.SendEmailAsync(appUser.Email, "Confirm Your Account", $"Dear {appUser.UserName}, please confirm your account by clicking <a href='{confirmationLink}'>here</a>.");
+
+                return Ok(new
+                {
+                    UserName = appUser.UserName,
+                    EmailAddress = appUser.Email,
+                    token = _tokenService.CreateToken(appUser),
+                    qrCode,
+                    base32Secret
+                });
+            }
+            else
+            {
+                return StatusCode(500, createdUser.Errors);
             }
         }
 
@@ -213,7 +196,7 @@ namespace api.Controllers
             // var resetLink = Url.Action("ResetPassword", "Account", new{token = resetToken, email = forgotPasswordDto.Email}, Request.Scheme);
             var resetLink = $"http://localhost:5173/reset-password?Email={forgotPasswordDto.Email}&token={Uri.EscapeDataString(resetToken)}";
 
-            await _emailService.SendEmailAsync(user.Email, "Reset Password Image Gallery", $" Dear  Please reset your password by clicking on this link: {resetLink}");
+            await _emailService.SendEmailAsync(user.Email, "Password Reset Request for Gallery Ease", $" Dear {user.UserName} Please reset your password by clicking on this link: {resetLink}");
 
             return Ok("Password reset link has been sent to your email.");
         }
@@ -331,6 +314,31 @@ namespace api.Controllers
                 return BadRequest(new { message = "The new password and confirmation password do not match." });
             }
 
+            // Check if the new password is the same as any previous passwords
+            var passwordHistory = await _context.UserPasswordHistory
+                                                .Where(ph => ph.AppUserID == user.Id)
+                                                .ToListAsync();
+
+            foreach (var oldPassword in passwordHistory)
+            {
+                var passwordVerificationResult = _userManager.PasswordHasher.VerifyHashedPassword(user, oldPassword.PasswordHash, resetPasswordDto.NewPassword);
+                if (passwordVerificationResult == PasswordVerificationResult.Success)
+                {
+                    return BadRequest(new { message = "The new password must be different from any of the previous passwords." });
+                }
+            }
+
+            // Save the old password hash to the password history table
+            var oldPasswordHash = user.PasswordHash;
+            var newPasswordHistory = new UserPasswordHistory
+            {
+                PasswordHash = oldPasswordHash,
+                AppUserID = user.Id,
+                CreateDate = DateTime.UtcNow // Ensure you have a timestamp for password history
+            };
+            _context.UserPasswordHistory.Add(newPasswordHistory);
+            await _context.SaveChangesAsync();
+
             var resetPassResult = await _userManager.ResetPasswordAsync(user, resetPasswordDto.Token, resetPasswordDto.NewPassword);
             if (!resetPassResult.Succeeded)
             {
@@ -340,5 +348,6 @@ namespace api.Controllers
 
             return Ok(new { message = "Password has been reset successfully." });
         }
+
     }
 }

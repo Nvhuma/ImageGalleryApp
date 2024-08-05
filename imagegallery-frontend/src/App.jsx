@@ -8,7 +8,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css'; // Import Font Awesome
 import ForgotPassword from './components/ForgotPassword/ForgotPassword';
 import Logout from './components/Logout/logout';
 import axios from "axios";
-
+import ImageUpload from './components/UploadImages/ImageUpload';
 
 function App() {
      
@@ -21,6 +21,7 @@ function App() {
           <Route path="/Register" element={<Register />} />
           <Route path="/reset-password" element={< ResetPassword />} />
           <Route path="/ForgotPassword" element={< ForgotPassword />} />
+          <Route path = "/ImageUpload" element ={<ImageUpload/>} />
           <Route path="/logout" element={<Logout />} />
           {/* Add more routes here  */}
           <Route path="/" element={<Navigate replace to="/login" />} />

@@ -1,58 +1,67 @@
-/* logOut.css */
 .container {
-	display: flex;
-	height: 100vh;
-  }
-  
-  .sidebar {
-	width: 20%;
-	background-color: #2187AB;
-	padding: 20px;
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-  }
-  
-  .sidebar h1 {
-	color: white;
-  }
-  
-  .sidebar a {
-	color: white;
-	text-decoration: none;
-	margin: 10px 0;
-  }
-  
-  .main-content {
-	width: 80%;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	background-color: #E8E9EB;
-  }
-  
-  .logout-message {
-	background-color: white;
-	padding: 40px;
-	border-radius: 10px;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	text-align: center;
-  }
-  
-  .logout-message h2 {
-	margin-bottom: 20px;
-  }
-  
-  .logout-message button {
-	background-color: #2299DD;
-	color: white;
-	border: none;
-	padding: 10px 20px;
-	border-radius: 5px;
-	cursor: pointer;
-  }
-  
-  .logout-message button:hover {
-	background-color: #1A7FB6;
-  }
-  
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 20%;
+    background-color: #2187AB;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-logo {
+    max-width: 100%; 
+    margin-bottom: 20px;
+}
+
+.sidebar h1, .sidebar a {
+    color: white;
+}
+
+.sidebar a {
+    text-decoration: none;
+    margin: 10px 0;
+}
+
+.main-content {
+    width: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #E8E9EB;
+}
+
+.logout-message {
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    max-width: 400px;
+}
+
+.message-logo {
+    max-width: 100%;
+    margin-bottom: 20px;
+}
+
+.logout-message p {
+    margin-bottom: 20px;
+}
+
+.logout-message button {
+    background-color: #2299DD;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.logout-message button:hover {
+    background-color: #1A7FB6;
+}

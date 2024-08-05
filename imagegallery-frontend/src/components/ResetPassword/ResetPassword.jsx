@@ -2,38 +2,39 @@ import React, { useState, useEffect } from 'react';
 import './ResetPassword.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 const ResetPassword = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [token, setToken] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const tokenFromURL = queryParams.get('token');
-    const emailFromURL = queryParams.get('Email'); // Extract email from URL
+    const emailFromURL = queryParams.get('Email');
     if (tokenFromURL && emailFromURL) {
       setToken(tokenFromURL);
       setEmail(emailFromURL);
     } else {
       alert('Token or email is missing');
-      navigate('/forgot-password'); // Redirect if token or email is missing
+      navigate('/forgot-password');
     }
   }, [location, navigate]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log("Form submitted");
-    console.log("Email: ", email);
-    console.log("Password: ", password);
-    console.log("Confirm Password: ", confirmPassword);
-    console.log("Token: ", token);
+    setErrorMessage('');
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      setErrorMessage("Passwords do not match");
       return;
     }
 
@@ -45,10 +46,11 @@ const ResetPassword = () => {
         confirmPassword 
       });
       console.log("API response: ", response);
-      navigate('/login'); // Navigate to login or some other page after successful reset
+      navigate('/login');
     } catch (error) {
       console.error("Error during password reset: ", error);
-      alert("Error resetting password. Please try again.");
+      const errorMessage = error.response?.data?.message || "Error resetting password. Please try again.";
+      setErrorMessage(errorMessage);
     }
   };
 
@@ -56,32 +58,46 @@ const ResetPassword = () => {
     <div className="reset-password-container">
       <div className="reset-password-form">
         <h1>Reset Password</h1>
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
         <form onSubmit={handleSubmit}>
-          <label>Email Address</label>
           <input
-            type="email"
+            type="hidden"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter Email"
-            required
-            readOnly // Make the email field read-only since it's prefilled
+            readOnly
           />
           <label>New Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="New Password"
-            required
-          />
+          <div className="password-input-container">
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="New Password"
+              required
+            />
+            <span
+              className="password-toggle-icon"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+            </span>
+          </div>
           <label>Confirm Password</label>
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Confirm Password"
-            required
-          />
+          <div className="password-input-container">
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirm Password"
+              required
+            />
+            <span
+              className="password-toggle-icon"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            >
+              {showConfirmPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+              
+            </span>
+          </div>
           <button type="submit">Reset Password</button>
         </form>
       </div>

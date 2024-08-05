@@ -25,13 +25,13 @@
 .login-container {
   text-align: center;
   z-index: 1;
-  background: #FFF;  
-  width: 722px; /* Adjusted width */
-  height: 548px;
-  padding: 40px; /* Adjusted padding */
-  border-radius: 8px; /* Adjusted border radius */
-  opacity: 1; /* Ensure visibility */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add box-shadow for better look */
+  background: #FFF;
+  width: 762px;
+  height: 650px;
+  padding: 40px;
+  border-radius: 8px;
+  
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -40,32 +40,39 @@
 
 .login-container h1 {
   margin-bottom: 20px;
-  font-size: 34px;
+  font-size: 34px; 
   font-weight: bold;
-  margin-left: 185px;
+  margin-left: 1.5px;
   height: 68px;
   width: 324px;
-  padding: 10px 0px 0px 0px;
+  padding: 10px 0 0 0;
   gap: 10px;
 }
 
 .input-group {
   position: relative;
   margin-bottom: 1.5rem;
-  width: 400px; /* Adjusted width to be responsive */
+  width: 400px; 
+  opacity: 1;
 }
 
 .input-label {
   display: block;
-  margin-bottom: 0.5rem; /* Adjusted margin */
-  color: #2187AB;
+  margin-bottom: 0.5rem;
+  color: #2187AB;; 
   text-align: left;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px; 
+  font-weight: 600;
+  line-height: 14.52px;
 }
 
 .input-icon {
   display: flex;
   align-items: center;
   position: relative;
+  width: 100%;
+  
 }
 
 .input-icon i {
@@ -78,25 +85,54 @@
 
 .input-icon input {
   width: 100%;
-  padding: 1rem 1rem 1rem 2.5rem; /* Adjusted padding */
-  border: 1px solid #ddd;
+  padding: 10px 0 0 0;
   border-radius: 4px;
+  border: 0.5px 0 0 0;
+  border: 1px solid #ddd;
+  padding: 0.75rem 1rem 0.75rem 2.5rem; 
   margin-bottom: 0;
   color: #060504;
   font-family: 'Poppins', sans-serif;
 }
 
+.input-icon input:focus,
+.input-icon input:hover {
+  border: 1px solid #2187AB;
+}
 .input-icon input:hover + i,
 .input-icon input:focus + i {
   opacity: 0;
 }
 
-.forgot-password {
-  display: block;
-  margin: 10px 0;
+.remember-me-and-forgot-password {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 600; 
   color: #2187AB;
-  margin-left: 260px;
+}
+
+.remember-me input[type="checkbox"] {
+  margin-right: 0.5rem;
+  accent-color: #2187AB;
+}
+
+.forgot-password {
+  color: #2187AB;
   text-decoration: none;
+  font-size: 12px; 
+  font-weight: 600; 
+  line-height: 14.52px;
+  font-family: 'Poppins', sans-serif;
 }
 
 .forgot-password:hover {
@@ -104,18 +140,17 @@
 }
 
 .login-container .login-button {
-  width: 400px;
+  width: 100%; 
   height: 44px;
-  padding: 10px;
-  background-color:#2187AB;
+  padding: 0.75rem;
+  background-color: #2187AB;
   color: white;
   border: none;
   border-radius: 4px;
-  gap: 10px;
   cursor: pointer;
-  font-weight: bold;
-  font-size: 1rem;
-  margin-top: 20px; /* Adjusted margin */
+  font-weight: 600; 
+  font-size: 16px;
+  margin-top: 20px;
 }
 
 .login-button:hover {
@@ -127,13 +162,26 @@
   margin-top: 20px;
   color: #0F3C4C;
   text-decoration: none;
+  font-size: 14px; 
+  font-weight: 500; 
+    text-align: center;
 }
 
 .register-link:hover {
-  text-decoration:underline;
+  text-decoration: underline;
 }
 
 .error-message {
   color: #e74c3c;
-  /* Red error message */
+  font-size: 14px; 
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 20px;
+  color: #2187AB;
 }
