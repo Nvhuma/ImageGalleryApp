@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OtpNet;
 using QRCoder;
+using System;
 
 namespace api.Controllers
 {
@@ -48,75 +49,77 @@ namespace api.Controllers
 
         }
 
-
-
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginDto loginDto)
+public async Task<IActionResult> Login(LoginDto loginDto)
+{
+    if (!ModelState.IsValid)
+    {
+        return BadRequest(ModelState);
+    }
+
+    var user = await _userManager.FindByNameAsync(loginDto.UserName.ToLower());
+
+    if (user == null || !await _userManager.CheckPasswordAsync(user, loginDto.Password))
+    {
+        return Unauthorized(new { Message = "Invalid username or password" });
+    }
+
+    if (!user.EmailConfirmed)
+    {
+        return Unauthorized(new { Message = "User email is not confirmed." });
+    }
+
+    if (await _userManager.IsLockedOutAsync(user))
+    {
+        var lockoutEndDate = await _userManager.GetLockoutEndDateAsync(user);
+        var remainingLockoutTime = lockoutEndDate?.Subtract(DateTimeOffset.UtcNow);
+
+        return Unauthorized(new
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            Message = "Account is locked due to multiple failed login attempts.",
+            RemainingLockoutTime = remainingLockoutTime?.TotalSeconds
+        });
+    }
 
-            var user = await _userManager.FindByNameAsync(loginDto.UserName.ToLower());
+    // Login successful, return a response indicating success, 
+    // no need to return a token yet, since TOTP needs to be verified
+    return Ok(new
+    {
+        UserName = user.UserName,
+        Message = "Username and password are correct, proceed to TOTP verification."
+    });
+}
 
-            if (user == null) return Unauthorized(new { Message = "Invalid username or password" });
+[HttpPost("totp")]
+public async Task<IActionResult> VerifyTotp(TotpDto totpDto)
+{
+    var user = await _userManager.FindByNameAsync(totpDto.UserName.ToLower());
 
-            if (!user.EmailConfirmed) return Unauthorized(new { Message = "User email is not confirmed." });
+    if (user == null || !await _userManager.CheckPasswordAsync(user, totpDto.Password))
+    {
+        return Unauthorized(new { Message = "Invalid username or password" });
+    }
 
-            if (await _userManager.IsLockedOutAsync(user))
-            {
-                var lockoutEndDate = await _userManager.GetLockoutEndDateAsync(user);
-                var remainingLockoutTime = lockoutEndDate?.Subtract(DateTimeOffset.UtcNow);
+    var totp = new Totp(Base32Encoding.ToBytes(user.TotpSecret));
+    if (!totp.VerifyTotp(totpDto.TotpCode, out long timeStepMatched, new VerificationWindow(2, 2)))
+    {
+        return Unauthorized(new { Message = "Invalid TOTP code" });
+    }
 
-                return Unauthorized(new
-                {
-                    Message = "Account is locked due to multiple failed login attempts.",
-                    remainingLockoutTime = remainingLockoutTime?.TotalSeconds
-                });
-            }
+    // Reset the access failed count after a successful login
+    await _userManager.ResetAccessFailedCountAsync(user);
 
-            var result = await _signinmanager.CheckPasswordSignInAsync(user, loginDto.Password, true);
+    // Generate and return the token
+    var token = _tokenService.CreateToken(user);
+    return Ok(new
+    {
+        UserName = user.UserName,
+        EmailAddress = user.Email,
+        token
+    });
+}
 
-            if (!result.Succeeded)
-            {
-                await _userManager.AccessFailedAsync(user);
 
-                if (await _userManager.IsLockedOutAsync(user))
-                {
-                    var lockoutEndDate = await _userManager.GetLockoutEndDateAsync(user);
-                    var remainingLockoutTime = lockoutEndDate?.Subtract(DateTimeOffset.UtcNow);
-
-                    return Unauthorized(new
-                    {
-                        Message = "Account is locked due to multiple failed login attempts.",
-                        RemainingLockoutTime = remainingLockoutTime?.TotalSeconds
-                    });
-                }
-
-                return Unauthorized(new { Message = "Invalid username or password" });
-            }
-
-            // Verify TOTP code
-            var totp = new Totp(Base32Encoding.ToBytes(user.TotpSecret));
-            if (!totp.VerifyTotp(loginDto.TotpCode, out long timeStepMatched, new VerificationWindow(2, 2)))
-            {
-                return Unauthorized(new { Message = "Invalid TOTP code" });
-            }
-
-            // Update TwoFactorEnabled column after successful TOTP verification
-            if (!user.TwoFactorEnabled)
-            {
-                user.TwoFactorEnabled = true;
-                await _userManager.UpdateAsync(user);
-            }
-
-            await _userManager.ResetAccessFailedCountAsync(user);
-
-            return Ok(new
-            {
-                UserName = user.UserName,
-                EmailAddress = user.Email,
-                token = _tokenService.CreateToken(user)
-            });
-        }
 
 
         [HttpPost("register")]
@@ -162,8 +165,26 @@ namespace api.Controllers
                 var otpUri = $"otpauth://totp/Image Gallery App:{appUser.Email}?secret={base32Secret}&issuer=Image Gallery App";
                 var qrCodeData = qrGenerator.CreateQrCode(otpUri, QRCodeGenerator.ECCLevel.Q);
                 var qrCode = new Base64QRCode(qrCodeData).GetGraphic(20);
+                var emailBody = $@"
+                  <html>
+                 <body>
 
-                await _emailService.SendEmailAsync(appUser.Email, "Confirm Your Account", $"Dear {appUser.UserName}, please confirm your account by clicking <a href='{confirmationLink}'>here</a>.");
+            <h1> Dear {appUser.UserName}, </h1>
+            
+          <p>  This email is to confirm that your account has been successfully registered with the Image Gallery App.
+            Please confirm your account by clicking <a href='{confirmationLink}'>here</a>. </p>
+
+            If you did not initiate this registration, please ignore this email.
+
+            The information contained in this communication is confidential and may be legally privileged. It is intended solely for use by the originator and others authorised to receive it. If you are not that person you are hereby notified that any disclosure, copying, distribution or taking action in reliance of the contents of this information is strictly prohibited and may be unlawful. Neither Singular Systems (Pty) Ltd (Registration 2002/001492/07) nor any of its subsidiaries are liable for the proper, complete transmission of the information contained in this communication, or for any delay in its receipt, or for the assurance that it is virus-free. If you have received this in error please report it to: sis@singular.co.za
+
+            Best regards,
+            Singular Systems Team
+        ";
+
+                await _emailService.SendEmailAsync(appUser.Email, "Confirm Your Account", emailBody);
+
+
 
                 return Ok(new
                 {
@@ -193,10 +214,32 @@ namespace api.Controllers
             if (user == null) return NotFound("User with email does not exist");
 
             var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-            // var resetLink = Url.Action("ResetPassword", "Account", new{token = resetToken, email = forgotPasswordDto.Email}, Request.Scheme);
+
             var resetLink = $"http://localhost:5173/reset-password?Email={forgotPasswordDto.Email}&token={Uri.EscapeDataString(resetToken)}";
 
-            await _emailService.SendEmailAsync(user.Email, "Password Reset Request for Gallery Ease", $" Dear {user.UserName} Please reset your password by clicking on this link: {resetLink}");
+            var emailBody = $@"   
+             <html>
+        <body>
+           <h1> Dear {user.UserName}, </h1>
+                                  
+        
+      <p>  We received a request to reset your password for your account with Gallery Ease. </p>
+        <p>  Please reset your password by clicking <a href='{resetLink}'>here</a>. </p>
+
+        If you did not request a password reset, please ignore this email.
+
+        The information contained in this communication is confidential and may be legally privileged. It is intended solely for use by the originator and others authorised to receive it. If you are not that person you are hereby notified that any disclosure, copying, distribution or taking action in reliance of the contents of this information is strictly prohibited and may be unlawful. Neither Singular Systems (Pty) Ltd (Registration 2002/001492/07) nor any of its subsidiaries are liable for the proper, complete transmission of the information contained in this communication, or for any delay in its receipt, or for the assurance that it is virus-free. If you have received this in error please report it to: sis@singular.co.za
+
+
+        Best regards,
+        Gallery Ease Team
+
+         </body>
+        </html>
+    ";
+
+            await _emailService.SendEmailAsync(user.Email, "Password Reset Request for Gallery Ease", emailBody);
+
 
             return Ok("Password reset link has been sent to your email.");
         }
@@ -235,7 +278,7 @@ namespace api.Controllers
             {
                 From = new MailAddress(SmtpFrom),
                 Subject = "Password Reset Request",
-                Body = $" Dear Please reset your password by clicking on this link: {resetLink}",
+                Body = $" Please reset your password by clicking on this link: {resetLink}",
                 IsBodyHtml = true
             };
 

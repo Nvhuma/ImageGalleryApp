@@ -151,3 +151,6 @@ C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\package-lock.json
 C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\package.json
 C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\Otp.NET.dll
 C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\QRCoder.dll
+C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\AWSSDK.Core.dll
+C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\AWSSDK.S3.dll
+C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\AWSSDK.Extensions.NETCore.Setup.dll
