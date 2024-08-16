@@ -46,7 +46,7 @@ const ResetPassword = () => {
         confirmPassword 
       });
       console.log("API response: ", response);
-      navigate('/login');
+      navigate('/PasswordChanged');
     } catch (error) {
       console.error("Error during password reset: ", error);
       const errorMessage = error.response?.data?.message || "Error resetting password. Please try again.";

@@ -1,0 +1,76 @@
+.totp-page {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100vh;
+	background-color: #f0f4f8;
+  }
+  
+  .totp-container {
+	background: #ffffff;
+	padding: 30px;
+	border-radius: 10px;
+	box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+	text-align: center;
+	width: 400px;
+  }
+  
+  .totp-container h1 {
+	margin-bottom: 20px;
+	font-size: 24px;
+	font-weight: 600;
+  }
+  
+  .input-group {
+	margin-bottom: 20px;
+	text-align: left;
+  }
+  
+  .input-label {
+	display: block;
+	font-weight: 500;
+	margin-bottom: 8px;
+  }
+  
+  .input-icon {
+	position: relative;
+  }
+  
+  .input-icon input {
+	width: 100%;
+	padding: 10px 40px 10px 15px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	font-size: 16px;
+  }
+  
+  .input-icon i {
+	position: absolute;
+	right: 15px;
+	top: 50%;
+	transform: translateY(-50%);
+	font-size: 18px;
+	color: #888;
+  }
+  
+  .totp-button {
+	background-color: #007bff;
+	color: #ffffff;
+	padding: 10px 20px;
+	border: none;
+	border-radius: 5px;
+	font-size: 16px;
+	cursor: pointer;
+	width: 100%;
+  }
+  
+  .totp-button:hover {
+	background-color: #0056b3;
+  }
+  
+  .error-message {
+	color: red;
+	margin-top: 10px;
+	font-weight: 500;
+  }
+  

@@ -21,7 +21,7 @@ body {
   }
 
 .sidebar {
-    width: 250px;
+    width: 390px;
     background-color:  #2187AB;
     display: flex;
     flex-direction: column;

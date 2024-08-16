@@ -7,7 +7,7 @@
 
 .form-section {
   flex: 1;
-  padding: 50px;
+  padding: 100px;
   background-color: #FFFFFF;
   display: flex;
   flex-direction: column;
@@ -16,7 +16,7 @@
 }
 
 h1 {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   text-align: left;
   font-size: 32px;
   color: #0F3C4C;
@@ -91,9 +91,11 @@ form {
 
 .google-btn,
 .facebook-btn {
-  width: 100%;
-  max-width: 400px;
+  width: 400px;
   height: 44px;
+  top: 708px;
+  left: 73px;
+  opacity: 0px;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -150,7 +152,13 @@ form {
 }
 
 .image-section {
-  flex: 1;
+  width: 1300px;
+  top: 54px;
+  left: 540px;
+  gap: 0px;
+  border-radius: 4px 0px 0px 0px;
+  opacity: 0px;
+
   background: url('/src/assets/image-gallery.jpeg') no-repeat center center;
   background-size: cover;
   border-radius: 0px 4px 4px 0px;

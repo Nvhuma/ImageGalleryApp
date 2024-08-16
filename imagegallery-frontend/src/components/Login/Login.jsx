@@ -9,15 +9,14 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [totpCode, setTotpCode] = useState(""); // New state for TOTP code
   const [rememberMe, setRememberMe] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isUsernameActive, setIsUsernameActive] = useState(false);
   const [isPasswordActive, setIsPasswordActive] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
   const navigate = useNavigate();
 
-  // Load remembered credentials from localStorage if they exist
   useEffect(() => {
     const savedUsername = localStorage.getItem("rememberedUsername");
     const savedPassword = localStorage.getItem("rememberedPassword");
@@ -26,26 +25,21 @@ function Login() {
     if (savedUsername || savedPassword) setRememberMe(true);
   }, []);
 
-  // Handle login attempt
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("Login attempted with:", username, password, totpCode);
+    console.log("Login attempted with:", username, password);
 
     try {
       const response = await axios.post("http://localhost:5263/api/Account/login", {
         UserName: username,
-        Password: password,
-        TotpCode: totpCode // Include TOTP code in the request
+        Password: password
       });
 
       console.log("Login response:", response.data);
 
-      // Store token and user information in localStorage
       localStorage.setItem("token", response.data.token);
-      localStorage.setItem("username", response.data.userName); // Store username
       localStorage.setItem("user", JSON.stringify(response.data));
 
-      // Remember credentials if checkbox is selected
       if (rememberMe) {
         localStorage.setItem("rememberedUsername", username);
         localStorage.setItem("rememberedPassword", password);
@@ -54,8 +48,12 @@ function Login() {
         localStorage.removeItem("rememberedPassword");
       }
 
-      alert("Login successful!");
-      navigate("/home");
+      localStorage.setItem("username", username);
+      localStorage.setItem("password", password);
+      localStorage.setItem("email", response.data.emailAddress); // Ensure email is stored
+
+      alert("Login successful! Please enter your TOTP code.");
+      navigate("/totp");
     } catch (error) {
       console.error("Login error:", error);
 
@@ -65,7 +63,7 @@ function Login() {
         if (message) {
           if (message.includes("Account is locked")) {
             const remainingTime = Math.ceil(error.response.data.remainingLockoutTime);
-            setErrorMessage(`${message} You can try again in ${remainingTime} seconds.`);
+            setErrorMessage(`${message} You can try again in ${remainingTime} Seconds`);
           } else {
             setErrorMessage(message);
           }
@@ -122,32 +120,16 @@ function Login() {
               <i className="fas fa-lock"></i>
             </div>
           </div>
-          <div className="input-group">
-            <label htmlFor="totpCode" className="input-label">TOTP Code</label>
-            <div className="input-icon">
-              <input
-                type="text"
-                id="totpCode"
-                value={totpCode}
-                onChange={(e) => setTotpCode(e.target.value)}
-                placeholder="Enter TOTP Code"
-                required
-              />
-              <i className="fas fa-key"></i>
-            </div>
+          <div className="remember-me">
+            <input
+              type="checkbox"
+              id="rememberMe"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+            />
+            <label htmlFor="rememberMe">Remember Me</label>
           </div>
-          <div className="remember-me-and-forgot-password">
-            <div className="remember-me">
-              <input
-                type="checkbox"
-                id="rememberMe"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-              />
-              <label htmlFor="rememberMe">Remember Me</label>
-            </div>
-            <Link to="/ForgotPassword" className="forgot-password">Forgot Password?</Link>
-          </div>
+          <Link to="/ForgotPassword" className="forgot-password">Forgot Password?</Link>
           <button type="submit" className="login-button">Login</button>
         </form>
         {errorMessage && <p className="error-message">{errorMessage}</p>}

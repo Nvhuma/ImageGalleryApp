@@ -23,7 +23,7 @@ function ForgotPassword() {
                 setMessage('Error sending password reset link.');
             }
         } finally {
-            setMessage('Password reset link has been sent to your email.')
+            setMessage('Password reset link has been sent to your email.');
             setLoading(false);
         }
     };
@@ -33,7 +33,7 @@ function ForgotPassword() {
             <div className="forgot-password-box">
                 <h2>Recover Password</h2>
                 <form onSubmit={handleSubmit}>
-                    <label> Email Address</label>
+                    <label>Email Address</label>
                     <input 
                         type="email" 
                         value={email} 
@@ -41,7 +41,7 @@ function ForgotPassword() {
                         onChange={(e) => setEmail(e.target.value)} 
                         required 
                     />
-                    <p className="login-link">
+                    <p className="forgot-password-login-link">
                         <Link to="/login">Back to Login</Link>
                     </p>
                     <button type="submit" disabled={loading}>

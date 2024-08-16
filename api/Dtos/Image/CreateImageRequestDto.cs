@@ -25,7 +25,8 @@ namespace api.Dtos.Image
         [Required]
         public DateTime CreatedDate { get; set; }
 
-        public IFormFile Image { get; set; } // For file upload
-        
+          public IFormFile Image { get; set; } // For file upload
+        // [Required]
+        // public string UserId { get; set; }
     }
 }

@@ -9,6 +9,9 @@ import ForgotPassword from './components/ForgotPassword/ForgotPassword';
 import Logout from './components/Logout/logout';
 import axios from "axios";
 import ImageUpload from './components/UploadImages/ImageUpload';
+import PasswordChanged from './components/PasswordChanged/PasswordChanged';
+import Totp from './components/Topt/Totp';
+
 
 function App() {
      
@@ -23,7 +26,9 @@ function App() {
           <Route path="/ForgotPassword" element={< ForgotPassword />} />
           <Route path = "/ImageUpload" element ={<ImageUpload/>} />
           <Route path="/logout" element={<Logout />} />
-          {/* Add more routes here  */}
+          <Route path="/PasswordChanged" element={< PasswordChanged />} />
+          <Route path="/Totp" element={< Totp />} />
+          {/* i can  more routes here  */}
           <Route path="/" element={<Navigate replace to="/login" />} />
         </Routes>
       </div>
