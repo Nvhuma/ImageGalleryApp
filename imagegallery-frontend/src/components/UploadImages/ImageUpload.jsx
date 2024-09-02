@@ -128,9 +128,16 @@ const ImageUpload = () => {
         imageURL: cloudinaryUrl,
       };
 
+      // Store the imageId from the response in local storage
+      const imageId = result.data.imageId;
+      localStorage.setItem("imageId", imageId);
+
       // Retrieve existing images
       const storedImages = JSON.parse(localStorage.getItem(username)) || [];
       storedImages.push(newImage);
+      localStorage.setItem(username, JSON.stringify(storedImages));
+      const deleteImages = JSON.parse(localStorage.getItem(username)) || [];
+      deleteImages.push(newImage);
       localStorage.setItem(username, JSON.stringify(storedImages));
 
       console.log("Upload successful", result.data);

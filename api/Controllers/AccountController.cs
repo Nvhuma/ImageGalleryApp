@@ -50,74 +50,101 @@ namespace api.Controllers
         }
 
         [HttpPost("login")]
-public async Task<IActionResult> Login(LoginDto loginDto)
-{
-    if (!ModelState.IsValid)
-    {
-        return BadRequest(ModelState);
-    }
-
-    var user = await _userManager.FindByNameAsync(loginDto.UserName.ToLower());
-
-    if (user == null || !await _userManager.CheckPasswordAsync(user, loginDto.Password))
-    {
-        return Unauthorized(new { Message = "Invalid username or password" });
-    }
-
-    if (!user.EmailConfirmed)
-    {
-        return Unauthorized(new { Message = "User email is not confirmed." });
-    }
-
-    if (await _userManager.IsLockedOutAsync(user))
-    {
-        var lockoutEndDate = await _userManager.GetLockoutEndDateAsync(user);
-        var remainingLockoutTime = lockoutEndDate?.Subtract(DateTimeOffset.UtcNow);
-
-        return Unauthorized(new
+        public async Task<IActionResult> Login(LoginDto loginDto)
         {
-            Message = "Account is locked due to multiple failed login attempts.",
-            RemainingLockoutTime = remainingLockoutTime?.TotalSeconds
-        });
-    }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-    // Login successful, return a response indicating success, 
-    // no need to return a token yet, since TOTP needs to be verified
-    return Ok(new
-    {
-        UserName = user.UserName,
-        Message = "Username and password are correct, proceed to TOTP verification."
-    });
-}
+            var user = await _userManager.FindByNameAsync(loginDto.UserName.ToLower());
 
-[HttpPost("totp")]
-public async Task<IActionResult> VerifyTotp(TotpDto totpDto)
-{
-    var user = await _userManager.FindByNameAsync(totpDto.UserName.ToLower());
+            if (user == null)
+            {
+                return Unauthorized(new { Message = "Invalid username or password" });
+            }
 
-    if (user == null || !await _userManager.CheckPasswordAsync(user, totpDto.Password))
-    {
-        return Unauthorized(new { Message = "Invalid username or password" });
-    }
+            if (!user.EmailConfirmed)
+            {
+                return Unauthorized(new { Message = "User email is not confirmed." });
+            }
 
-    var totp = new Totp(Base32Encoding.ToBytes(user.TotpSecret));
-    if (!totp.VerifyTotp(totpDto.TotpCode, out long timeStepMatched, new VerificationWindow(2, 2)))
-    {
-        return Unauthorized(new { Message = "Invalid TOTP code" });
-    }
+            if (await _userManager.IsLockedOutAsync(user))
+            {
+                var lockoutEndDate = await _userManager.GetLockoutEndDateAsync(user);
+                var remainingLockoutTime = lockoutEndDate?.Subtract(DateTimeOffset.UtcNow);
 
-    // Reset the access failed count after a successful login
-    await _userManager.ResetAccessFailedCountAsync(user);
+                return Unauthorized(new
+                {
+                    Message = "Account is locked due to multiple failed login attempts.",
+                    RemainingLockoutTime = remainingLockoutTime?.TotalSeconds
+                });
+            }
 
-    // Generate and return the token
-    var token = _tokenService.CreateToken(user);
-    return Ok(new
-    {
-        UserName = user.UserName,
-        EmailAddress = user.Email,
-        token
-    });
-}
+            var result = await _signinmanager.CheckPasswordSignInAsync(user, loginDto.Password, true);
+
+            if (!result.Succeeded)
+            {
+                await _userManager.AccessFailedAsync(user);
+
+                var accessFailedCount = await _userManager.GetAccessFailedCountAsync(user);
+                var maxFailedAccessAttempts = 3;
+                var attemptsLeft = maxFailedAccessAttempts - accessFailedCount;
+
+                if (accessFailedCount >= maxFailedAccessAttempts)
+                {
+                    await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddMinutes(5));
+
+                    return Unauthorized(new
+                    {
+                        Message = "Account is locked due to multiple failed login attempts.",
+                        RemainingLockoutTime = 120 // 3 minutes lockout in seconds
+                    });
+                }
+
+                return Unauthorized(new { Message = $"Invalid username or password. You have {attemptsLeft} attempt(s) left." });
+            }
+
+            // Login successful, return a response indicating success, 
+            // no need to return a token yet, since TOTP needs to be verified
+            return Ok(new
+            {
+                UserName = user.UserName,
+                EmailAddress = user.Email,
+                Message = "Username and password are correct, proceed to TOTP verification."
+            });
+        }
+
+
+        [HttpPost("totp")]
+        public async Task<IActionResult> VerifyTotp(TotpDto totpDto)
+        {
+            var user = await _userManager.FindByNameAsync(totpDto.UserName.ToLower());
+
+            if (user == null || !await _userManager.CheckPasswordAsync(user, totpDto.Password))
+            {
+                return Unauthorized(new { Message = "Invalid username or password" });
+            }
+
+            var totp = new Totp(Base32Encoding.ToBytes(user.TotpSecret));
+            if (!totp.VerifyTotp(totpDto.TotpCode, out long timeStepMatched, new VerificationWindow(2, 2)))
+            {
+                return Unauthorized(new { Message = "Invalid TOTP code" });
+            }
+
+            // Reset the access failed count after a successful login
+            await _userManager.ResetAccessFailedCountAsync(user);
+
+            // Generate and return the token
+            var token = _tokenService.CreateToken(user);
+            return Ok(new
+            {
+                UserName = user.UserName,
+                token,
+                UserId = user.Id,
+                EmailAddress = user.Email
+            });
+        }
 
 
 
@@ -289,16 +316,15 @@ public async Task<IActionResult> VerifyTotp(TotpDto totpDto)
                 await SmtpClient.SendMailAsync(mailMessage);
                 _logger.LogInformation("Email sent successfully to {Email}", email);
             }
+
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Could not send email to {Email}", email);
                 // Log the exception
                 throw new InvalidOperationException("Could not send email", ex);
+
             }
-
         }
-
-
 
         [HttpGet("confirmemail")]
         public async Task<IActionResult> ConfirmEmail(string userId, string token)
@@ -321,6 +347,8 @@ public async Task<IActionResult> VerifyTotp(TotpDto totpDto)
             }
         }
 
+
+
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
@@ -338,59 +366,244 @@ public async Task<IActionResult> VerifyTotp(TotpDto totpDto)
             }
         }
 
-        [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword(ResetPasswordDto resetPasswordDto)
+    //     [HttpPost("reset-password")]
+    //     public async Task<IActionResult> ResetPassword(ResetPasswordDto resetPasswordDto)
+    //     {
+    //         if (!ModelState.IsValid)
+    //         {
+    //             return BadRequest(ModelState);
+    //         }
+
+    //         // Check if the user is logged in
+    //         var loggedInUser = await _userManager.GetUserAsync(User);
+    //         if (loggedInUser != null && loggedInUser.Email == resetPasswordDto.Email)
+    //         {
+    //             // If the user is logged in, we can skip the token validation
+
+    //             // Validate the new password and confirmation password match
+    //             if (resetPasswordDto.NewPassword != resetPasswordDto.ConfirmPassword)
+    //             {
+    //                 return BadRequest(new { message = "The new password and confirmation password do not match." });
+    //             }
+
+    //             // Check if the new password is the same as any previous passwords
+    //             var passwordHistory = await _context.UserPasswordHistory
+    //                                                 .Where(ph => ph.AppUserID == loggedInUser.Id)
+    //                                                 .ToListAsync();
+
+    //             foreach (var oldPassword in passwordHistory)
+    //             {
+    //                 var passwordVerificationResult = _userManager.PasswordHasher.VerifyHashedPassword(loggedInUser, oldPassword.PasswordHash, resetPasswordDto.NewPassword);
+    //                 if (passwordVerificationResult == PasswordVerificationResult.Success)
+    //                 {
+    //                     return BadRequest(new { message = "The new password must be different from any of the previous passwords." });
+    //                 }
+    //             }
+
+    //             // Save the old password hash to the password history table
+    //             var oldPasswordHash = loggedInUser.PasswordHash;
+    //             var newPasswordHistory = new UserPasswordHistory
+    //             {
+    //                 PasswordHash = oldPasswordHash,
+    //                 AppUserID = loggedInUser.Id,
+    //                 CreateDate = DateTime.UtcNow
+    //             };
+    //             _context.UserPasswordHistory.Add(newPasswordHistory);
+    //             await _context.SaveChangesAsync();
+
+    //             // Update the password without using the reset token
+    //             var resetPassResult = await _userManager.RemovePasswordAsync(loggedInUser);
+    //             if (!resetPassResult.Succeeded)
+    //             {
+    //                 return BadRequest(new { message = "Failed to remove the old password." });
+    //             }
+
+    //             resetPassResult = await _userManager.AddPasswordAsync(loggedInUser, resetPasswordDto.NewPassword);
+    //             if (!resetPassResult.Succeeded)
+    //             {
+    //                 return BadRequest(new { message = "Failed to set the new password." });
+    //             }
+
+    //             return Ok(new { message = "Password has been reset successfully." });
+    //         }
+    //         else
+    //         {
+    //             // Proceed with the regular password reset logic for non-logged-in users
+    //             var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
+    //             if (user == null)
+    //             {
+    //                 return BadRequest(new { message = "Invalid email address." });
+    //             }
+
+    //             if (resetPasswordDto.NewPassword != resetPasswordDto.ConfirmPassword)
+    //             {
+    //                 return BadRequest(new { message = "The new password and confirmation password do not match." });
+    //             }
+
+    //             // Check if the new password is the same as any previous passwords
+    //             var passwordHistory = await _context.UserPasswordHistory
+    //                                                 .Where(ph => ph.AppUserID == user.Id)
+    //                                                 .ToListAsync();
+
+    //             foreach (var oldPassword in passwordHistory)
+    //             {
+    //                 var passwordVerificationResult = _userManager.PasswordHasher.VerifyHashedPassword(user, oldPassword.PasswordHash, resetPasswordDto.NewPassword);
+    //                 if (passwordVerificationResult == PasswordVerificationResult.Success)
+    //                 {
+    //                     return BadRequest(new { message = "The new password must be different from any of the previous passwords." });
+    //                 }
+    //             }
+
+    //             // Save the old password hash to the password history table
+    //             var oldPasswordHash = user.PasswordHash;
+    //             var newPasswordHistory = new UserPasswordHistory
+    //             {
+    //                 PasswordHash = oldPasswordHash,
+    //                 AppUserID = user.Id,
+    //                 CreateDate = DateTime.UtcNow
+    //             };
+    //             _context.UserPasswordHistory.Add(newPasswordHistory);
+    //             await _context.SaveChangesAsync();
+
+    //             var resetPassResult = await _userManager.ResetPasswordAsync(user, resetPasswordDto.Token, resetPasswordDto.NewPassword);
+    //             if (!resetPassResult.Succeeded)
+    //             {
+    //                 var errors = resetPassResult.Errors.Select(e => e.Description);
+    //                 return BadRequest(new { message = "Password reset failed.", errors });
+    //             }
+
+    //             return Ok(new { message = "Password has been reset successfully." });
+    //         }
+    //     }
+    // }
+    [HttpPost("reset-password")]
+public async Task<IActionResult> ResetPassword(ResetPasswordDto resetPasswordDto)
+{
+    if (!ModelState.IsValid)
+    {
+        return BadRequest(ModelState);
+    }
+
+    // Check if the user is logged in
+    var loggedInUser = await _userManager.GetUserAsync(User);
+    if (loggedInUser != null && loggedInUser.Email == resetPasswordDto.Email)
+    {
+        // Generate the reset token for the logged-in user
+        var token = await _userManager.GeneratePasswordResetTokenAsync(loggedInUser);
+
+        // Generate the reset link
+       
+
+        var resetLink = $"http://localhost:5173/reset-password?token={Uri.EscapeDataString(token)}&Email={resetPasswordDto.Email}";
+
+
+        // Return the reset link to the frontend
+        return Ok(new { message = "Password reset link generated successfully.", resetLink });
+
+        // Optional: If you want to reset the password without token validation, uncomment below code
+        /*
+        // Validate the new password and confirmation password match
+        if (resetPasswordDto.NewPassword != resetPasswordDto.ConfirmPassword)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
-            if (user == null)
-            {
-                return BadRequest(new { message = "Invalid email address." });
-            }
-
-            if (resetPasswordDto.NewPassword != resetPasswordDto.ConfirmPassword)
-            {
-                return BadRequest(new { message = "The new password and confirmation password do not match." });
-            }
-
-            // Check if the new password is the same as any previous passwords
-            var passwordHistory = await _context.UserPasswordHistory
-                                                .Where(ph => ph.AppUserID == user.Id)
-                                                .ToListAsync();
-
-            foreach (var oldPassword in passwordHistory)
-            {
-                var passwordVerificationResult = _userManager.PasswordHasher.VerifyHashedPassword(user, oldPassword.PasswordHash, resetPasswordDto.NewPassword);
-                if (passwordVerificationResult == PasswordVerificationResult.Success)
-                {
-                    return BadRequest(new { message = "The new password must be different from any of the previous passwords." });
-                }
-            }
-
-            // Save the old password hash to the password history table
-            var oldPasswordHash = user.PasswordHash;
-            var newPasswordHistory = new UserPasswordHistory
-            {
-                PasswordHash = oldPasswordHash,
-                AppUserID = user.Id,
-                CreateDate = DateTime.UtcNow // Ensure you have a timestamp for password history
-            };
-            _context.UserPasswordHistory.Add(newPasswordHistory);
-            await _context.SaveChangesAsync();
-
-            var resetPassResult = await _userManager.ResetPasswordAsync(user, resetPasswordDto.Token, resetPasswordDto.NewPassword);
-            if (!resetPassResult.Succeeded)
-            {
-                var errors = resetPassResult.Errors.Select(e => e.Description);
-                return BadRequest(new { message = "Password reset failed.", errors });
-            }
-
-            return Ok(new { message = "Password has been reset successfully." });
+            return BadRequest(new { message = "The new password and confirmation password do not match." });
         }
 
+        // Check if the new password is the same as any previous passwords
+        var passwordHistory = await _context.UserPasswordHistory
+                                            .Where(ph => ph.AppUserID == loggedInUser.Id)
+                                            .ToListAsync();
+
+        foreach (var oldPassword in passwordHistory)
+        {
+            var passwordVerificationResult = _userManager.PasswordHasher.VerifyHashedPassword(loggedInUser, oldPassword.PasswordHash, resetPasswordDto.NewPassword);
+            if (passwordVerificationResult == PasswordVerificationResult.Success)
+            {
+                return BadRequest(new { message = "The new password must be different from any of the previous passwords." });
+            }
+        }
+
+        // Save the old password hash to the password history table
+        var oldPasswordHash = loggedInUser.PasswordHash;
+        var newPasswordHistory = new UserPasswordHistory
+        {
+            PasswordHash = oldPasswordHash,
+            AppUserID = loggedInUser.Id,
+            CreateDate = DateTime.UtcNow
+        };
+        _context.UserPasswordHistory.Add(newPasswordHistory);
+        await _context.SaveChangesAsync();
+
+        // Update the password using the reset token
+        var resetPassResult = await _userManager.ResetPasswordAsync(loggedInUser, token, resetPasswordDto.NewPassword);
+        if (!resetPassResult.Succeeded)
+        {
+            var errors = resetPassResult.Errors.Select(e => e.Description);
+            return BadRequest(new { message = "Password reset failed.", errors });
+        }
+
+        return Ok(new { message = "Password has been reset successfully." });
+        */
+    }
+    else
+    {
+        // Proceed with the regular password reset logic for non-logged-in users
+        var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
+        if (user == null)
+        {
+            return BadRequest(new { message = "Invalid email address." });
+        }
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var resetLink = $"http://localhost:5173/reset-password?userId={user.Id}&token={Uri.EscapeDataString(token)}";
+
+        // Return the reset link to the frontend
+        return Ok(new { message = "Password reset link generated successfully.", resetLink });
+
+        // Optional: Proceed with password reset using the token
+        /*
+        if (resetPasswordDto.NewPassword != resetPasswordDto.ConfirmPassword)
+        {
+            return BadRequest(new { message = "The new password and confirmation password do not match." });
+        }
+
+        // Check if the new password is the same as any previous passwords
+        var passwordHistory = await _context.UserPasswordHistory
+                                            .Where(ph => ph.AppUserID == user.Id)
+                                            .ToListAsync();
+
+        foreach (var oldPassword in passwordHistory)
+        {
+            var passwordVerificationResult = _userManager.PasswordHasher.VerifyHashedPassword(user, oldPassword.PasswordHash, resetPasswordDto.NewPassword);
+            if (passwordVerificationResult == PasswordVerificationResult.Success)
+            {
+                return BadRequest(new { message = "The new password must be different from any of the previous passwords." });
+            }
+        }
+
+        // Save the old password hash to the password history table
+        var oldPasswordHash = user.PasswordHash;
+        var newPasswordHistory = new UserPasswordHistory
+        {
+            PasswordHash = oldPasswordHash,
+            AppUserID = user.Id,
+            CreateDate = DateTime.UtcNow
+        };
+        _context.UserPasswordHistory.Add(newPasswordHistory);
+        await _context.SaveChangesAsync();
+
+        var resetPassResult = await _userManager.ResetPasswordAsync(user, resetPasswordDto.Token, resetPasswordDto.NewPassword);
+        if (!resetPassResult.Succeeded)
+        {
+            var errors = resetPassResult.Errors.Select(e => e.Description);
+            return BadRequest(new { message = "Password reset failed.", errors });
+        }
+
+        return Ok(new { message = "Password has been reset successfully." });
+        */
     }
 }
+
+}
+}
+
+

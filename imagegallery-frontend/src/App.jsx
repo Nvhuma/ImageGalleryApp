@@ -11,6 +11,7 @@ import axios from "axios";
 import ImageUpload from './components/UploadImages/ImageUpload';
 import PasswordChanged from './components/PasswordChanged/PasswordChanged';
 import Totp from './components/Topt/Totp';
+import UpdateImageForm from './components/UpdateImageForm/UpdateImageForm.jsx'
 
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
           <Route path="/reset-password" element={< ResetPassword />} />
           <Route path="/ForgotPassword" element={< ForgotPassword />} />
           <Route path = "/ImageUpload" element ={<ImageUpload/>} />
+           <Route path = "/UpdateImageForm" element ={<UpdateImageForm/>} />
           <Route path="/logout" element={<Logout />} />
           <Route path="/PasswordChanged" element={< PasswordChanged />} />
           <Route path="/Totp" element={< Totp />} />

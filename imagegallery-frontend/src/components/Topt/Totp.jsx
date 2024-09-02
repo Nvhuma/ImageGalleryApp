@@ -11,14 +11,11 @@ function Totp() {
   const handleTotpSubmit = async (e) => {
     e.preventDefault();
 
-    // Fetch credentials from localStorage
     const username = localStorage.getItem("username");
     const password = localStorage.getItem("password");
 
-    // Log fetched credentials for debugging
     console.log("Fetched Credentials:", { username, password, totpCode });
 
-    // If credentials or TOTP code is missing, display error
     if (!username || !password || !totpCode) {
       console.error("Username, password, or TOTP code is missing.");
       setErrorMessage("Username, password, or TOTP code is missing. Please log in again.");
@@ -40,26 +37,29 @@ function Totp() {
         }
       );
 
-      // Log the full response for debugging
       console.log("TOTP verification response:", response.data);
 
-      // Check if the response indicates success
       if (response.data && response.data.token) {
         alert("Login successful!");
 
-        // Store the auth token if provided
+        // Store the entire response in local storage
         localStorage.setItem("authToken", response.data.token);
+        localStorage.setItem("userId", response.data.userId); // Store the userId
+        localStorage.setItem("email", response.data.emailAddress);
+        localStorage.setItem("username", response.data.userName);
+        
+        // Optionally, you can save the entire response object if needed
+        localStorage.setItem("totpResponse", JSON.stringify(response.data));
 
+        // Navigate to the home page
         navigate("/home");
       } else {
-        // Log the exact data returned when the code is invalid
         console.error("Invalid TOTP code. Response data:", response.data);
         setErrorMessage("Invalid TOTP code. Please try again.");
       }
     } catch (error) {
       console.error("TOTP verification error:", error);
 
-      // Handle specific errors
       if (error.response && error.response.status === 401) {
         setErrorMessage("Unauthorized: Check your credentials and TOTP code.");
       } else if (error.response && error.response.data && error.response.data.error) {
@@ -71,13 +71,14 @@ function Totp() {
   };
 
   return (
-    <div className="totp-page">
-      <div className="totp-container">
-        <h1>TOTP Verification</h1>
+    <div className="totp-auth-page">
+      <div className="totp-auth-container">
+        <h1>Image Gallery App</h1>
+        <p>Your login is protected with an authenticator app. Enter your authenticator code below.</p>
         <form onSubmit={handleTotpSubmit}>
-          <div className="input-group">
-            <label htmlFor="totpCode" className="input-label">Authenticator Code</label>
-            <div className="input-icon">
+          <div className="totp-auth-input-group">
+            <label htmlFor="totpCode" className="totp-auth-input-label">Authenticator Code</label>
+            <div className="totp-auth-input-icon">
               <input
                 type="text"
                 id="totpCode"
@@ -89,9 +90,9 @@ function Totp() {
               <i className="fas fa-key"></i>
             </div>
           </div>
-          <button type="submit" className="totp-button">Login</button>
+          <button type="submit" className="totp-auth-button">Login</button>
         </form>
-        {errorMessage && <p className="error-message">{errorMessage}</p>}
+        {errorMessage && <p className="totp-auth-error-message">{errorMessage}</p>}
       </div>
     </div>
   );

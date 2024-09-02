@@ -1,8 +1,12 @@
+// Home.jsx
 import React, { useState, useEffect } from 'react';
 import { FaHome, FaUpload, FaSignOutAlt, FaBook } from 'react-icons/fa';
 import { MdSearch, MdFilterList } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import UpdateImageForm from './UpdateImageForm.jsx';
+
+ // Importing the UpdateImageForm component
 import './home.css';
 
 const Home = () => {
@@ -12,11 +16,15 @@ const Home = () => {
   const [userImages, setUserImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [viewLibrary, setViewLibrary] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [showUpdateForm, setShowUpdateForm] = useState(false);
+  const [imageToUpdate, setImageToUpdate] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch all images from the API
     const fetchImages = async () => {
       try {
         const response = await axios.get('http://localhost:5263/api/image');
@@ -30,18 +38,52 @@ const Home = () => {
 
     fetchImages();
 
-    // Get username from localStorage
     const storedUsername = localStorage.getItem("username");
+    const storedEmail = localStorage.getItem("email");
+
     if (storedUsername) {
       setUsername(storedUsername);
+      setEmail(storedEmail || "");
 
-      // Fetch user-specific images from localStorage
       const userImagesFromStorage = JSON.parse(localStorage.getItem(storedUsername)) || [];
       setUserImages(userImagesFromStorage);
     } else {
       navigate("/login");
     }
   }, [navigate]);
+
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await axios.post('http://localhost:5263/api/Account/logout');
+
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      localStorage.removeItem('email');
+      localStorage.removeItem('userId');
+
+      navigate('/logout');
+    } catch (error) {
+      console.error('Logout failed', error);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    try {
+      const response = await axios.post('http://localhost:5263/api/Account/reset-password', {
+        email: email,
+      });
+
+      const resetLink = response.data.resetLink;
+      window.location.href = resetLink;
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      alert('Failed to request password reset. Please try again.');
+    }
+  };
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -51,15 +93,54 @@ const Home = () => {
     setLibraryPage(page);
   };
 
-  const handleLogout = async () => {
-    try {
-      await axios.post('http://localhost:5263/api/Account/logout');
-      localStorage.removeItem('token');
-      localStorage.removeItem('username');
-      navigate('/logout');
-    } catch (error) {
-      console.error('Logout failed', error);
+  const handleUpdateImageClick = (image) => {
+    setImageToUpdate(image);
+    setShowUpdateForm(true);
+  };
+
+  const handleUpdateSuccess = (updatedImage) => {
+    setImages(images.map(image => (image.imageId === updatedImage.imageId ? updatedImage : image)));
+    setShowUpdateForm(false);
+    setImageToUpdate(null);
+  };
+
+  const handleCancelUpdate = () => {
+    setShowUpdateForm(false);
+    setImageToUpdate(null);
+  };
+
+  const handleDeleteImage = async (imageId, imageUserId) => {
+    const storedUserId = localStorage.getItem('userId');
+
+    if (storedUserId !== imageUserId) {
+      alert("You can only delete images that you have uploaded.");
+      return;
     }
+
+    try {
+      await axios.delete(`http://localhost:5263/api/image/${imageId}`, {
+        params: { loggedInUserId: storedUserId }
+      });
+
+      if (viewLibrary) {
+        setUserImages(userImages.filter(image => image.imageId !== imageId));
+      } else {
+        setImages(images.filter(image => image.imageId !== imageId));
+      }
+
+      alert("Image deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      alert('Failed to delete the image. Please try again.');
+    }
+  };
+
+  const handleImageClick = (image) => {
+    setSelectedImage(image);
+  };
+
+  const handleCloseImage = () => {
+    setSelectedImage(null);
   };
 
   const imagesPerPage = 6;
@@ -104,9 +185,13 @@ const Home = () => {
       <div className="content">
         <div className="header">
           <h2>{viewLibrary ? 'My Library' : 'Home'}</h2>
-          <div className="user">
+          <div className="user" onClick={toggleDropdown}>
             <span>{username || "User"}</span>
             <img src="/src/assets/user.png" alt="User Avatar" />
+            <div className={`dropdown ${dropdownOpen ? 'show' : ''}`}>
+              <p>{email || "No email provided"}</p>
+              <button onClick={handleResetPassword}>Reset Password</button>
+            </div>
           </div>
         </div>
         <div className="search-filter">
@@ -119,70 +204,89 @@ const Home = () => {
             Filters
           </button>
         </div>
-        <div className="image-grid">
-          {loading ? (
-            <p>Loading...</p>
-          ) : viewLibrary ? (
-            filteredUserImages.map((image, index) => (
-              <div key={index} className="image-item">
-                {image.imageURL ? (
-                  <img src={image.imageURL} alt={image.title} />
-                ) : (
-                  <div className="placeholder">Image not available</div>
-                )}
-                <div className="item-details">
-                  <h4 className="name">{image.title}</h4>
-                  <p className="description">{image.description}</p>
+        {showUpdateForm && imageToUpdate ? (
+          <UpdateImageForm
+            image={imageToUpdate}
+            onCancel={handleCancelUpdate}
+            onUpdateSuccess={handleUpdateSuccess}
+          />
+        ) : selectedImage ? (
+          <div className="single-image-view">
+            <button className="close-button" onClick={handleCloseImage}>×</button>
+            <img src={selectedImage.imageURL} alt={selectedImage.title} className="single-image" />
+            <div className="image-details">
+              <h3>{selectedImage.title}</h3>
+              <p>{selectedImage.description}</p>
+            </div>
+          </div>
+        ) : (
+          <div className="image-grid">
+            {loading ? (
+              <p>Loading...</p>
+            ) : viewLibrary ? (
+              filteredUserImages.map((image, index) => (
+                <div key={image.imageId || index} className="image-item" onClick={() => handleImageClick(image)}>
+                  {image.imageURL ? (
+                    <img src={image.imageURL} alt={image.title} />
+                  ) : (
+                    <div className="placeholder">Image not available</div>
+                  )}
+                  <div className="image-actions">
+                    <button onClick={(e) => { e.stopPropagation(); handleDeleteImage(image.imageId, image.userId) }}>Delete</button>
+                    <button onClick={(e) => { e.stopPropagation(); handleUpdateImageClick(image) }}>Update</button>
+                  </div>
                 </div>
-              </div>
-            ))
-          ) : (
-            filteredImages.map((image, index) => (
-              <div key={image.id || index} className="image-item">
-                {image.imageURL ? (
-                  <img src={image.imageURL} alt={image.title} />
-                ) : (
-                  <div className="placeholder">Image not available</div>
-                )}
-                <div className="item-details">
-                  <h4 className="name">{image.title}</h4>
-                  <p className="description">{image.description}</p>
+              ))
+            ) : (
+              filteredImages.map((image, index) => (
+                <div key={image.imageId || index} className="image-item" onClick={() => handleImageClick(image)}>
+                  {image.imageURL ? (
+                    <img src={image.imageURL} alt={image.title} />
+                  ) : (
+                    <div className="placeholder">Image not available</div>
+                  )}
+                  <div className="item-details">
+                    <h4 className="name">{image.title}</h4>
+                    <p className="description">{image.description}</p>
+                  </div>
+                  <div className="image-actions">
+                    {image.userId === localStorage.getItem('userId') && (
+                      <>
+                        <button onClick={(e) => { e.stopPropagation(); handleDeleteImage(image.imageId, image.userId) }}>Delete</button>
+                        <button onClick={(e) => { e.stopPropagation(); handleUpdateImageClick(image) }}>Update</button>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))
-          )}
-        </div>
-        <div className="pagination">
-          {viewLibrary ? (
-            <>
-              <button onClick={() => handleLibraryPageChange(libraryPage - 1)} disabled={libraryPage === 1}>&lt;</button>
-              {[...Array(totalLibraryPages)].map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleLibraryPageChange(index + 1)}
-                  className={libraryPage === index + 1 ? 'active' : ''}
-                >
-                  {index + 1}
-                </button>
-              ))}
-              <button onClick={() => handleLibraryPageChange(libraryPage + 1)} disabled={libraryPage === totalLibraryPages}>&gt;</button>
-            </>
-          ) : (
-            <>
-              <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>&lt;</button>
-              {[...Array(totalPages)].map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => handlePageChange(index + 1)}
-                  className={currentPage === index + 1 ? 'active' : ''}
-                >
-                  {index + 1}
-                </button>
-              ))}
-              <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>&gt;</button>
-            </>
-          )}
-        </div>
+              ))
+            )}
+          </div>
+        )}
+        {viewLibrary ? (
+          <div className="pagination">
+            {Array.from({ length: totalLibraryPages }, (_, index) => (
+              <button
+                key={index + 1}
+                onClick={() => handleLibraryPageChange(index + 1)}
+                className={libraryPage === index + 1 ? 'active' : ''}
+              >
+                {index + 1}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="pagination">
+            {Array.from({ length: totalPages }, (_, index) => (
+              <button
+                key={index + 1}
+                onClick={() => handlePageChange(index + 1)}
+                className={currentPage === index + 1 ? 'active' : ''}
+              >
+                {index + 1}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

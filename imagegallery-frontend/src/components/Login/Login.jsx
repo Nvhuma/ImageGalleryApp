@@ -37,8 +37,13 @@ function Login() {
 
       console.log("Login response:", response.data);
 
+      // Storing token, user, and userId in localStorage
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data));
+      localStorage.setItem("UserId", response.data.UserId); // Correctly stores the userId
+      localStorage.setItem("email", response.data.emailAddress);
+
+   
 
       if (rememberMe) {
         localStorage.setItem("rememberedUsername", username);
@@ -50,13 +55,12 @@ function Login() {
 
       localStorage.setItem("username", username);
       localStorage.setItem("password", password);
-      localStorage.setItem("email", response.data.emailAddress); // Ensure email is stored
 
       alert("Login successful! Please enter your TOTP code.");
       navigate("/totp");
+
     } catch (error) {
       console.error("Login error:", error);
-
       if (error.response && error.response.status === 401) {
         const message = error.response.data.Message || error.response.data.message;
 
@@ -80,7 +84,7 @@ function Login() {
     <div className="login-page">
       <div className="login-container">
         <h1>Image Gallery App</h1>
-        <h2>Login</h2>
+        <h2>Log in</h2>
         <form onSubmit={handleLogin}>
           <div className="input-group">
             <label htmlFor="username" className="input-label">Username</label>
@@ -92,7 +96,8 @@ function Login() {
                 onChange={(e) => setUsername(e.target.value)}
                 onFocus={() => setIsUsernameActive(true)}
                 onBlur={() => setIsUsernameActive(username !== "")}
-                placeholder="Enter Username"
+                placeholder="   Enter Username"
+                className="inputTab"
                 required
               />
               <i className="fas fa-user"></i>
@@ -108,8 +113,9 @@ function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 onFocus={() => setIsPasswordActive(true)}
                 onBlur={() => setIsPasswordActive(password !== "")}
-                placeholder="Enter Password"
+                placeholder="   Enter Password"
                 required
+                className="inputTab"
               />
               <span
                 className="password-toggle-icon"
@@ -119,17 +125,19 @@ function Login() {
               </span>
               <i className="fas fa-lock"></i>
             </div>
+            <div className="remember-me-and-forgot-password">
+              <div className="remember-me">
+                <input
+                  type="checkbox"
+                  id="rememberMe"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                />
+                <label htmlFor="rememberMe">Remember Me</label>
+              </div>
+              <Link to="/ForgotPassword" className="forgot-password">Forgot Password?</Link>
+            </div>
           </div>
-          <div className="remember-me">
-            <input
-              type="checkbox"
-              id="rememberMe"
-              checked={rememberMe}
-              onChange={(e) => setRememberMe(e.target.checked)}
-            />
-            <label htmlFor="rememberMe">Remember Me</label>
-          </div>
-          <Link to="/ForgotPassword" className="forgot-password">Forgot Password?</Link>
           <button type="submit" className="login-button">Login</button>
         </form>
         {errorMessage && <p className="error-message">{errorMessage}</p>}

@@ -30,6 +30,7 @@ namespace api.Controllers
             _userManager = userManager;
             _imageRepo = imageRepo;
         }
+        
 
         // GET: api/comment
         // Retrieves all comments

@@ -14,11 +14,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Cors;
 using System.Net;
 
-
 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 var builder = WebApplication.CreateBuilder(args);
-
-
 
 // Adding configuration sources
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
@@ -29,14 +26,14 @@ builder.Configuration.AddEnvironmentVariables();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
-        builder => builder.WithOrigins("http://localhost:5173") // React app's URL
-                          .AllowAnyHeader()
-                          .AllowAnyMethod());
+        corsBuilder => corsBuilder.WithOrigins("http://localhost:5173") // React app's URL
+                                  .AllowAnyHeader()
+                                  .AllowAnyMethod()
+                                  .AllowCredentials()); // Allow credentials if needed
 });
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 builder.Services.AddSwaggerGen(option =>
 {
     option.SwaggerDoc("v1", new OpenApiInfo { Title = "ImageGallery API", Version = "v1" });
@@ -60,11 +57,11 @@ builder.Services.AddSwaggerGen(option =>
             {
                 Reference = new OpenApiReference
                 {
-                    Type=ReferenceType.SecurityScheme,
-                    Id="Bearer"
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
                 }
             },
-            new string[]{}
+            new string[] { }
         }
     });
 });
@@ -120,7 +117,8 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(
             System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"])
-        )
+        ),
+        ValidateLifetime = true // Ensure tokens have a valid expiration time
     };
 });
 
@@ -133,11 +131,9 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddLogging();
 
-
 var app = builder.Build();
 
-
-// Configurig the HTTP request pipeline.
+// Configuring the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -150,14 +146,13 @@ app.UseCors("AllowReactApp");
 // Redirect HTTP requests to HTTPS
 app.UseHttpsRedirection();
 
-//  authentication middleware
+// Authentication middleware
 app.UseAuthentication();
 
-
+// Authorization middleware
 app.UseAuthorization();
 
-// controller routes
+// Controller routes
 app.MapControllers();
-
 
 app.Run();
