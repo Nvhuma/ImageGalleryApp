@@ -9,6 +9,7 @@ using api.Mappers;
 using api.Dtos.ImageTag;
 using api.Interfaces;
 using api.Helpers;
+using api.Models;
 
 
 namespace api.Controllers
@@ -21,41 +22,40 @@ namespace api.Controllers
         private readonly ApplicationDBContext _context;
         private readonly IImageTagRepository _imageTagRepo;
 
+
+        private readonly ITagRepository _tagRepository;
+
         // Constructor
-        public ImageTagController(ApplicationDBContext context, IImageTagRepository imageTagRepo)
+        public ImageTagController(ApplicationDBContext context, IImageTagRepository imageTagRepo,  ITagRepository tagRepository)
         {
             _imageTagRepo = imageTagRepo;
             _context = context;
+             _tagRepository = tagRepository;
         }
 
-        // GET: api/ImageTag
-        // Retrieves all image tags based on query parameters
-        [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
+         // POST: api/ImageTag
+        [HttpPost]
+        public async Task<IActionResult> CreateImageTag([FromBody] ImageTag imageTag)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            // Ensure that the ImageTagID is not manually set by clients
+            imageTag.ImageTagID = 0;
 
-            var imageTags = await _imageTagRepo.GetAllAsync(query);
-            var ImageTagDto = imageTags.Select(it => it.ToImageTagDto());
-            return Ok(ImageTagDto);
+            var createdImageTag = await _imageTagRepo.CreateAsync(imageTag);
+
+            return CreatedAtAction(nameof(GetById), new { id = createdImageTag.ImageTagID }, createdImageTag);
         }
 
-        // GET: api/ImageTag/{ImageTagId}
-        // Retrieves a specific image tag by ID
-        [HttpGet]
-        [Route("{ImageTagId:int}")]
-        public async Task<IActionResult> GetById([FromRoute] int ImageTagID)
+    
+         // GET: api/ImageTag/Search/{tagName}
+        [HttpGet("Search/{tagName}")]
+        public async Task<IActionResult> SearchByTagName(string tagName)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var imageTags = await _imageTagRepo.GetByIdAsync(ImageTagID);
-            if (imageTags == null)
+            var images = await _imageTagRepo.GetImagesByTagNameAsync(tagName);
+            if (images == null || !images.Any())
             {
                 return NotFound();
             }
-            return Ok(imageTags.ToImageTagDto());
+            return Ok(images);
         }
 
         // POST: api/ImageTag/{Id}
@@ -73,40 +73,33 @@ namespace api.Controllers
             return CreatedAtAction(nameof(GetById), new { id = imageTagModel.ImageTagID }, imageTagModel.ToImageTagDto());
         }
 
-        // PUT: api/ImageTag/{id}
-        // Updates an existing image tag
-        [HttpPut]
-        [Route("{id:int}")]
-        public async Task<IActionResult> Update([FromRoute] int ImageTagId, [FromBody] UpdateImageTagRequestDto updateDto)
+        private object GetById()
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var imageTagModel = await _imageTagRepo.UpdateAsync(ImageTagId, updateDto);
-            if (imageTagModel == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(imageTagModel.ToImageTagDto());
+            throw new NotImplementedException();
         }
 
-        // DELETE: api/ImageTag/{id}
-        // Deletes a specific image tag
-        [HttpDelete]
-        [Route("{id:int}")]
-        public async Task<IActionResult> Delete([FromRoute] int id)
+        // PUT: api/ImageTag/{id}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateImageTag(int id, [FromBody] UpdateImageTagRequestDto imageTagDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var imageTagModel = await _imageTagRepo.DeleteAsync(id);
-            if (imageTagModel == null)
+            var updatedImageTag = await _imageTagRepo.UpdateAsync(id, imageTagDto);
+            if (updatedImageTag == null)
             {
                 return NotFound();
             }
+            return Ok(updatedImageTag);
+        }
 
-            return NoContent();
+         // DELETE: api/ImageTag/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteImageTag(int id)
+        {
+            var deletedImageTag = await _imageTagRepo.DeleteAsync(id);
+            if (deletedImageTag == null)
+            {
+                return NotFound();
+            }
+            return Ok(deletedImageTag);
         }
     }
 }

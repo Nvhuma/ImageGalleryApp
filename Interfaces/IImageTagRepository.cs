@@ -15,5 +15,13 @@ namespace api.Interfaces
         Task<ImageTag> CreateAsync(ImageTag imageTagRepository);
         Task<ImageTag?> UpdateAsync(int id, UpdateImageTagRequestDto ImageTagDto);
         Task<ImageTag?> DeleteAsync(int id);
+        Task <IEnumerable<Image>> GetImagesByTagNameAsync(string tagName);
+       
+        
+       
+
+
+
+        
     }
 }

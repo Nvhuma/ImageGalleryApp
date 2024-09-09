@@ -6,7 +6,7 @@ using api.Models;
 
 namespace api.Interfaces
 {
-    // Interface defining operations for managing Comment entities
+    // Interface defining operations for managing Comment ent
     public interface ICommentRepository
     {
         // Retrieves all comments asynchronously

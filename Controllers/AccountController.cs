@@ -14,9 +14,13 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 using OtpNet;
 using QRCoder;
 using System;
+using Microsoft.AspNetCore.Authorization;
+
+
 
 namespace api.Controllers
 {
@@ -50,76 +54,106 @@ namespace api.Controllers
         }
 
         [HttpPost("login")]
-public async Task<IActionResult> Login(LoginDto loginDto)
-{
-    if (!ModelState.IsValid)
-    {
-        return BadRequest(ModelState);
-    }
-
-    var user = await _userManager.FindByNameAsync(loginDto.UserName.ToLower());
-
-    if (user == null || !await _userManager.CheckPasswordAsync(user, loginDto.Password))
-    {
-        return Unauthorized(new { Message = "Invalid username or password" });
-    }
-
-    if (!user.EmailConfirmed)
-    {
-        return Unauthorized(new { Message = "User email is not confirmed." });
-    }
-
-    if (await _userManager.IsLockedOutAsync(user))
-    {
-        var lockoutEndDate = await _userManager.GetLockoutEndDateAsync(user);
-        var remainingLockoutTime = lockoutEndDate?.Subtract(DateTimeOffset.UtcNow);
-
-        return Unauthorized(new
+        public async Task<IActionResult> Login(LoginDto loginDto)
         {
-            Message = "Account is locked due to multiple failed login attempts.",
-            RemainingLockoutTime = remainingLockoutTime?.TotalSeconds
-        });
-    }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-    // Login successful, return a response indicating success, 
-    // no need to return a token yet, since TOTP needs to be verified
-    return Ok(new
-    {
-        UserName = user.UserName,
-        Message = "Username and password are correct, proceed to TOTP verification."
-    });
-}
+            var user = await _userManager.FindByNameAsync(loginDto.UserName.ToLower());
 
-[HttpPost("totp")]
-public async Task<IActionResult> VerifyTotp(TotpDto totpDto)
-{
-    var user = await _userManager.FindByNameAsync(totpDto.UserName.ToLower());
+            if (user == null)
+            {
+                return Unauthorized(new { Message = "Invalid username or password" });
+            }
 
-    if (user == null || !await _userManager.CheckPasswordAsync(user, totpDto.Password))
-    {
-        return Unauthorized(new { Message = "Invalid username or password" });
-    }
+            if (!user.EmailConfirmed)
+            {
+                return Unauthorized(new { Message = "User email is not confirmed." });
+            }
 
-    var totp = new Totp(Base32Encoding.ToBytes(user.TotpSecret));
-    if (!totp.VerifyTotp(totpDto.TotpCode, out long timeStepMatched, new VerificationWindow(2, 2)))
-    {
-        return Unauthorized(new { Message = "Invalid TOTP code" });
-    }
+            if (await _userManager.IsLockedOutAsync(user))
+            {
+                var lockoutEndDate = await _userManager.GetLockoutEndDateAsync(user);
+                var remainingLockoutTime = lockoutEndDate?.Subtract(DateTimeOffset.UtcNow);
 
-    // Reset the access failed count after a successful login
-    await _userManager.ResetAccessFailedCountAsync(user);
+                return Unauthorized(new
+                {
+                    Message = "Account is locked due to multiple failed login attempts.",
+                    RemainingLockoutTime = remainingLockoutTime?.TotalSeconds
+                });
+            }
 
-    // Generate and return the token
-    var token = _tokenService.CreateToken(user);
-    return Ok(new
-    {
-        UserName = user.UserName,
-        EmailAddress = user.Email,
-        token
-    });
-}
+            var result = await _signinmanager.CheckPasswordSignInAsync(user, loginDto.Password, true);
+
+            if (!result.Succeeded)
+            {
+                await _userManager.AccessFailedAsync(user);
+
+                var accessFailedCount = await _userManager.GetAccessFailedCountAsync(user);
+                var maxFailedAccessAttempts = 3;
+                var attemptsLeft = maxFailedAccessAttempts - accessFailedCount;
+
+                if (accessFailedCount >= maxFailedAccessAttempts)
+                {
+                    await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddMinutes(5));
+
+                    return Unauthorized(new
+                    {
+                        Message = "Account is locked due to multiple failed login attempts.",
+                        RemainingLockoutTime = 120 // 3 minutes lockout in seconds
+                    });
+                }
+
+                return Unauthorized(new { Message = $"Invalid username or password. You have {attemptsLeft} attempt(s) left." });
+            }
+
+            // Login successful, return a response indicating success, 
+            // no need to return a token yet, since TOTP needs to be verified
+            return Ok(new
+            {
+                UserName = user.UserName,
+                EmailAddress = user.Email,
+                Message = "Username and password are correct, proceed to TOTP verification."
+            });
+        }
 
 
+        [HttpPost("totp")]
+        public async Task<IActionResult> VerifyTotp(TotpDto totpDto)
+        {
+            var user = await _userManager.FindByNameAsync(totpDto.UserName.ToLower());
+
+            if (user == null || !await _userManager.CheckPasswordAsync(user, totpDto.Password))
+            {
+                return Unauthorized(new { Message = "Invalid username or password" });
+            }
+            // relies on the TOTP algorythm's inherent behavior and the   VerificationWindow
+            var totp = new Totp(Base32Encoding.ToBytes(user.TotpSecret));
+            if (!totp.VerifyTotp(totpDto.TotpCode, out long timeStepMatched, new VerificationWindow(2, 2)))
+            {
+                return Unauthorized(new { Message = "Invalid TOTP code" });
+            }
+
+            // Reset the access failed count after a successful login
+            await _userManager.ResetAccessFailedCountAsync(user);
+
+            // Generate and return the token
+            var token = _tokenService.CreateToken(user);
+            return Ok(new
+            {
+                UserName = user.UserName,
+                token,
+                UserId = user.Id,
+                EmailAddress = user.Email
+            });
+              // new VerificationWindow(2, 2) when calling totp.VerifyTotp. 
+      //This means that the TOTP code will be accepted if it is valid within a 2-time-step window before or after the current time. 
+      // this provides a small buffer of time (usually 30 seconds per time step) 
+      //the code could be valid for up to 1 minute (2 steps before and 2 steps after the current time)
+        }
+     
 
 
         [HttpPost("register")]
@@ -171,7 +205,7 @@ public async Task<IActionResult> VerifyTotp(TotpDto totpDto)
 
             <h1> Dear {appUser.UserName}, </h1>
             
-          <p>  This email is to confirm that your account has been successfully registered with the Image Gallery App.
+          <p>  This email is to confirm that your account has been successfully registered with the Image Gallery Ease.
             Please confirm your account by clicking <a href='{confirmationLink}'>here</a>. </p>
 
             If you did not initiate this registration, please ignore this email.
@@ -202,6 +236,37 @@ public async Task<IActionResult> VerifyTotp(TotpDto totpDto)
         }
 
 
+// [HttpPost("forgot-password")]
+// public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
+// {
+//     if (!ModelState.IsValid)
+//         return BadRequest(ModelState);
+
+//     var user = await _userManager.FindByEmailAsync(forgotPasswordDto.Email);
+//     if (user == null) 
+//         return NotFound("User with email does not exist");
+
+//     var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+//     var resetLink = $"http://localhost:5173/reset-password?Email={forgotPasswordDto.Email}&token={Uri.EscapeDataString(resetToken)}";
+
+//     var emailBody = $@"
+//     <html>
+//     <body>
+//         <h1>Dear {user.UserName},</h1>
+//         <p>We received a request to reset your password for your account with Gallery Ease.</p>
+//         <p>Please reset your password by clicking <a href='{resetLink}'>here</a>.</p>
+//         <p>If you did not request a password reset, please ignore this email.</p>
+//         <p>The information contained in this communication is confidential and may be legally privileged. It is intended solely for use by the originator and others authorised to receive it. If you are not that person you are hereby notified that any disclosure, copying, distribution or taking action in reliance of the contents of this information is strictly prohibited and may be unlawful. Neither Singular Systems (Pty) Ltd (Registration 2002/001492/07) nor any of its subsidiaries are liable for the proper, complete transmission of the information contained in this communication, or for any delay in its receipt, or for the assurance that it is virus-free. If you have received this in error please report it to: sis@singular.co.za</p>
+//         <p>Best regards,<br/>Gallery Ease Team</p>
+//     </body>
+//     </html>";
+
+//     // Send the email with the reset link
+//     await _emailService.SendEmailAsync(user.Email, "Password Reset Request for Gallery Ease", emailBody);
+
+//     // Return the reset link to the frontend in the response
+//     return Ok(new { message = "Password reset link has been sent to your email.", resetLink = resetLink });
+// }
 
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
@@ -240,8 +305,11 @@ public async Task<IActionResult> VerifyTotp(TotpDto totpDto)
 
             await _emailService.SendEmailAsync(user.Email, "Password Reset Request for Gallery Ease", emailBody);
 
+            
 
-            return Ok("Password reset link has been sent to your email.");
+             return Ok(new { message = "Password reset link has been sent to your email.", resetLink = resetLink });
+
+           
         }
 
         private string GenerateResetLink(string userId, string token)
@@ -289,16 +357,15 @@ public async Task<IActionResult> VerifyTotp(TotpDto totpDto)
                 await SmtpClient.SendMailAsync(mailMessage);
                 _logger.LogInformation("Email sent successfully to {Email}", email);
             }
+
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Could not send email to {Email}", email);
                 // Log the exception
                 throw new InvalidOperationException("Could not send email", ex);
+
             }
-
         }
-
-
 
         [HttpGet("confirmemail")]
         public async Task<IActionResult> ConfirmEmail(string userId, string token)
@@ -321,6 +388,8 @@ public async Task<IActionResult> VerifyTotp(TotpDto totpDto)
             }
         }
 
+
+
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
@@ -338,6 +407,10 @@ public async Task<IActionResult> VerifyTotp(TotpDto totpDto)
             }
         }
 
+    
+
+
+   
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPasswordDto resetPasswordDto)
         {
@@ -393,4 +466,12 @@ public async Task<IActionResult> VerifyTotp(TotpDto totpDto)
         }
 
     }
+
+
+
+
+
 }
+
+
+

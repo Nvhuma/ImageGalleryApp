@@ -13,6 +13,8 @@ namespace api.Models
         public int ImageId { get; set; }
         public int TagId { get; set; }
 
+        public int TagName {get; set;}
+
         // Navigation properties
         public Image Image { get; set; } // The image associated with the tag
         public Tag Tag { get; set; }  // The tag associated with the image

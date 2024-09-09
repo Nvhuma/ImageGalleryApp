@@ -12,8 +12,8 @@ namespace api.Models
          public int TagId { get; set; }
         public string TagName { get; set; } = string.Empty;
 
-
         // Navigation properties
+         public ICollection<Image> Images { get; set; } 
         public List<ImageTag> ImageTags { get; set; }  // Images associated with the tag
     }
 }

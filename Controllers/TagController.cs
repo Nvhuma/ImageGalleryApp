@@ -92,5 +92,22 @@ namespace api.Controllers
 
             return NoContent();
         }
+
+        // GET: api/Tag/Search/{tagName}
+// Retrieves images associated with a specific tag name
+[HttpGet("Search/{tagName}")]
+public async Task<IActionResult> SearchByTagName([FromRoute] string tagName)
+{
+    var images = await _tagRepo.GetImagesByTagNameAsync(tagName);
+
+    if (images == null || !images.Any())
+    {
+        return NotFound("No images found for this tag.");
+    }
+
+    var imageDtos = images.Select(image => image.ToImageDto());
+    return Ok(imageDtos);
+}
+
     }
 }

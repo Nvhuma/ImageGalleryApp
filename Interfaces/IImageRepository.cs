@@ -10,6 +10,8 @@ namespace api.Interfaces
         // Retrieves all images asynchronously, with optional filtering via QueryObject
         Task<List<Image>> GetAllAsync(QueryObject query);
 
+         Task<List<Image>> GetAllByUserIdAsync(QueryObject query, string UserId);
+
         // Retrieves a specific image by its ID asynchronously
         // Returns null if the image is not found
         Task<Image?> GetByIdAsync(int id);
@@ -24,5 +26,6 @@ namespace api.Interfaces
         // Deletes an image by its ID asynchronously
         // Returns the deleted image or null if not found
         Task<Image?> DeleteAysnc(int id);
+        Task <Image> GetImageWithCommentsAsync(int imageId);
     }
 }

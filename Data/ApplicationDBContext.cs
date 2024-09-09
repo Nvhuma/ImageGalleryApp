@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
+
+
+
 namespace api.Data
 {
     public class ApplicationDBContext : IdentityDbContext<AppUser>
@@ -18,11 +21,16 @@ namespace api.Data
         }
 
         public DbSet<Tag> Tag { get; set; }
+
         public DbSet<Comment> Comments { get; set; }
+
         public DbSet<Image> Images { get; set; }
+
         public DbSet<ImageTag> ImageTags { get; set; }
+
         public DbSet<UserPasswordHistory> UserPasswordHistory { get; set; }
-        
+
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -49,12 +57,12 @@ namespace api.Data
                    .Property(u => u.Id)
                    .HasColumnName("UserID");
 
-              
 
-                 modelBuilder.Entity<UserPasswordHistory>()
-                .HasOne(uph => uph.AppUser)
-                .WithMany(u => u.UserPasswordHistories)
-                .HasForeignKey(uph => uph.AppUserID);
+
+            modelBuilder.Entity<UserPasswordHistory>()
+           .HasOne(uph => uph.AppUser)
+           .WithMany(u => u.UserPasswordHistories)
+           .HasForeignKey(uph => uph.AppUserID);
 
             modelBuilder.Entity<Image>()
                 .HasOne(i => i.AppUser)
@@ -74,6 +82,7 @@ namespace api.Data
             modelBuilder.Entity<ImageTag>()
                     .HasKey(it => it.ImageTagID);
 
+         
             modelBuilder.Entity<ImageTag>()
                 .Property(it => it.ImageTagID)
                 .ValueGeneratedOnAdd();

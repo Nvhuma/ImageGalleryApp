@@ -30,6 +30,7 @@ namespace api.Controllers
             _userManager = userManager;
             _imageRepo = imageRepo;
         }
+        
 
         // GET: api/comment
         // Retrieves all comments
@@ -138,44 +139,56 @@ namespace api.Controllers
         //     await _commentRepo.CreateAysnc(commentModel);
 
         //     return CreatedAtAction(nameof(getbyId), new { id = commentModel.CommentId }, commentModel.ToCommentDto());
-        // }
 
-        [HttpPost("{ImageId:int}")]
-        public async Task<IActionResult> Create([FromRoute] int ImageId, CreateCommentDto commentDto)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+  
+[HttpPost("{ImageId:int}")]
+public async Task<IActionResult> Create([FromRoute] int ImageId, [FromQuery] string Content)
+{
+    if (!ModelState.IsValid)
+    {
+        return BadRequest(ModelState);
+    }
 
-            if (!await _commentRepo.ImageExist(ImageId))
-            {
-                return BadRequest("Image does not exist");
-            }
+    // Check if the image exists
+    if (!await _commentRepo.ImageExist(ImageId))
+    {
+        return BadRequest("Image does not exist");
+    }
 
-            var userEmail = User.GetUserEmail();
+    // Retrieve the logged-in user's email from claims
+    var userEmail = User.GetUserEmail();
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return BadRequest("User not authenticated or email claim not found");
-            }
+    if (string.IsNullOrEmpty(userEmail))
+    {
+        return Unauthorized("User not authenticated or email claim not found");
+    }
 
-            // Use FirstOrDefaultAsync to avoid "Sequence contains more than one element" error
-            var appUser = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+    // Fetch the user by email
+    var appUser = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
 
-            if (appUser == null)
-            {
-                return BadRequest("User not found");
-            }
+    if (appUser == null)
+    {
+        return BadRequest("User not found");
+    }
 
-            var commentModel = commentDto.ToCommentFromCreate(ImageId);
-            commentModel.UserId = appUser.Id;
+    // Create a comment model and associate the logged-in user's ID
+    var commentModel = new Comment
+    {
+        ImageId = ImageId,
+        UserId = appUser.Id,  // Automatically set the UserId from the logged-in user
+        Content = Content,    // Use the Content passed in the query
+        //CreatedAt = DateTime.UtcNow
+    };
 
-            await _commentRepo.CreateAysnc(commentModel);
+    // Save the comment in the repository
+    await _commentRepo.CreateAysnc(commentModel);
 
-            return CreatedAtAction(nameof(getbyId), new { id = commentModel.CommentId }, commentModel.ToCommentDto());
-        }
+    // Return a 201 Created response with the comment details
+    return CreatedAtAction(nameof(getbyId), new { id = commentModel.CommentId }, commentModel.ToCommentDto());
+}
 
+  
+        
         // PUT: api/comment/{id}
         // Updates an existing comment
         [HttpPut]

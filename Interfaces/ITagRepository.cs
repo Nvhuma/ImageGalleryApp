@@ -14,5 +14,10 @@ namespace api.Interfaces
         Task<Tag> CreateAysnc(Tag tagModel);
         Task<Tag?> UpdateAysnc(int id, UpdateTagRequestDto tagDto);
         Task<Tag?> DeleteAysnc(int id);
+
+          Task<IEnumerable<Image>> GetImagesByTagNameAsync(string tagName);
+
+          
+
     }
 }

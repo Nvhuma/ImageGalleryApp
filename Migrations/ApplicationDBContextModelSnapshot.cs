@@ -51,13 +51,13 @@ namespace api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "37372130-7908-4a88-926f-7eb770d1886d",
+                            Id = "3c22e625-7f8f-4569-8ddd-1f3540f8f8e1",
                             Name = "Admin",
                             NormalizedName = "Admin"
                         },
                         new
                         {
-                            Id = "b1b82534-4f65-41c7-baa9-c21259a3a662",
+                            Id = "e90cfc72-739c-4509-a103-6211f0cbcc74",
                             Name = "User",
                             NormalizedName = "User"
                         });
@@ -305,6 +305,9 @@ namespace api.Migrations
                     b.Property<DateTime>("LastUpdated")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("TagId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -314,6 +317,8 @@ namespace api.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("ImageId");
+
+                    b.HasIndex("TagId");
 
                     b.HasIndex("UserId");
 
@@ -332,6 +337,9 @@ namespace api.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("TagId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TagName")
                         .HasColumnType("int");
 
                     b.HasKey("ImageTagID");
@@ -456,6 +464,10 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.Image", b =>
                 {
+                    b.HasOne("api.Models.Tag", null)
+                        .WithMany("Images")
+                        .HasForeignKey("TagId");
+
                     b.HasOne("api.Models.AppUser", "AppUser")
                         .WithMany("Images")
                         .HasForeignKey("UserId")
@@ -514,6 +526,8 @@ namespace api.Migrations
             modelBuilder.Entity("api.Models.Tag", b =>
                 {
                     b.Navigation("ImageTags");
+
+                    b.Navigation("Images");
                 });
 #pragma warning restore 612, 618
         }

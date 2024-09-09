@@ -20,19 +20,19 @@ namespace api.Repository
 
         public async Task<Tag> CreateAysnc(Tag tagModel)
         {
-           await _context.Tag.AddAsync(tagModel);
+            await _context.Tag.AddAsync(tagModel);
 
-           await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
 
-           return tagModel;
+            return tagModel;
         }
 
         public async Task<Tag?> DeleteAysnc(int id)
         {
             var tagModel = await _context.Tag.FirstOrDefaultAsync(x => x.TagId == id);
 
-            if(tagModel == null)
+            if (tagModel == null)
             {
                 return null;
             }
@@ -43,32 +43,44 @@ namespace api.Repository
         }
 
 
-        public  async Task<List<Tag>> GetAllAsync()
+        public async Task<List<Tag>> GetAllAsync()
         {
             return await _context.Tag.ToListAsync();
         }
 
         public async Task<Tag?> GetByIdAysnc(int id)
         {
-            return  await _context.Tag.FindAsync(id);
+            return await _context.Tag.FindAsync(id);
         }
+
+        public async Task<IEnumerable<Image>> GetImagesByTagNameAsync(string tagName)
+        {
+            var images = await _context.Tag
+        .Where(tag => tag.TagName == tagName)
+        .SelectMany(tag => tag.ImageTags.Select(it => it.Image))
+        .ToListAsync();
+
+            return images;
+        }
+
+
 
         public async Task<Tag?> UpdateAysnc(int id, UpdateTagRequestDto tagDto)
         {
             var existingTag = await _context.Tag.FirstOrDefaultAsync(x => x.TagId == id);
 
-            if(existingTag == null)
+            if (existingTag == null)
             {
                 return null;
             }
-             
-             // Update the tag fields
-             existingTag.TagId = tagDto.TagId; // Ensuring  this field exists in both the entity and DTO
-             existingTag.TagName = tagDto.TagName; // Update other fields as necessary if they arise 
 
-             await _context.SaveChangesAsync();
+            // Update the tag fields
+            existingTag.TagId = tagDto.TagId; // Ensuring  this field exists in both the entity and DTO
+            existingTag.TagName = tagDto.TagName; // Update other fields as necessary if they arise 
 
-             return existingTag;
+            await _context.SaveChangesAsync();
+
+            return existingTag;
         }
     }
 }
