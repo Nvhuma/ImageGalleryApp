@@ -31,8 +31,8 @@ The application architecture includes a **React** frontend, a **.NET Core** back
 ### **Frontend (React)**
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repo/image-gallery-app.git
-   cd image-gallery-app
+   git clone https://https://github.com/Nvhuma/ImageGalleryApp.git
+   cd ImageGalleryAPP
 
 
 Navigate to the frontend directory and install dependencies:
