@@ -1,24 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Mail;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
 using System.Web;
 using api.Data;
 using api.Dtos.Account;
 using api.Interfaces;
 using api.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc;
 using OtpNet;
 using QRCoder;
-using System;
-using Microsoft.AspNetCore.Authorization;
 
 
 

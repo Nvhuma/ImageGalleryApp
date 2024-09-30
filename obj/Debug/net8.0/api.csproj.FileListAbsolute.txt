@@ -8,11 +8,16 @@ C:\Users\NBvuma\ImageGalleryAPP\api\obj\Debug\net8.0\api.MvcApplicationPartsAsse
 C:\Users\NBvuma\ImageGalleryAPP\api\obj\Debug\net8.0\api.sourcelink.json
 C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\appsettings.Development.json
 C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\appsettings.json
+C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\package-lock.json
+C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\package.json
 C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\api.exe
 C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\api.deps.json
 C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\api.runtimeconfig.json
 C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\api.dll
 C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\api.pdb
+C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\AWSSDK.Core.dll
+C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\AWSSDK.Extensions.NETCore.Setup.dll
+C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\AWSSDK.S3.dll
 C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\Azure.Core.dll
 C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\Azure.Identity.dll
 C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\Humanizer.dll
@@ -52,6 +57,8 @@ C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\Microsoft.Win32.SystemEvent
 C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\Mono.TextTemplating.dll
 C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\Newtonsoft.Json.dll
 C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\Newtonsoft.Json.Bson.dll
+C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\Otp.NET.dll
+C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\QRCoder.dll
 C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
 C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
 C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
@@ -147,10 +154,3 @@ C:\Users\NBvuma\ImageGalleryAPP\api\obj\Debug\net8.0\refint\api.dll
 C:\Users\NBvuma\ImageGalleryAPP\api\obj\Debug\net8.0\api.pdb
 C:\Users\NBvuma\ImageGalleryAPP\api\obj\Debug\net8.0\api.genruntimeconfig.cache
 C:\Users\NBvuma\ImageGalleryAPP\api\obj\Debug\net8.0\ref\api.dll
-C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\package-lock.json
-C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\package.json
-C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\Otp.NET.dll
-C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\QRCoder.dll
-C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\AWSSDK.Core.dll
-C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\AWSSDK.S3.dll
-C:\Users\NBvuma\ImageGalleryAPP\api\bin\Debug\net8.0\AWSSDK.Extensions.NETCore.Setup.dll
