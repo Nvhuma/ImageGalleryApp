@@ -50,37 +50,18 @@ public class ImageController : ControllerBase
 
     // GET: api/image/{id:int}
     // Retrieves a specific image by ID
-    [HttpGet("{imageId:int}")]
-public async Task<IActionResult> GetById(int imageId)
-{
-    // Fetch the image with related comments
-   var images = await _imageRepo.GetByIdAsync(imageId);
-    
-    if (images == null)
+  
+  [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetById([FromRoute] int id)
     {
-        return NotFound();
+        var images = await _imageRepo.GetByIdAsync(id);
+        if (images == null)
+        {
+            return NotFound();
+        }
+        return Ok(images.ToImageDto());
     }
 
-    // Map the image and its comments to the DTO
-    var imageDto = new ImageDto
-    {
-        ImageId = images.ImageId,
-        Title = images.Title,
-        Description = images.Description,
-        ImageURL = images.ImageURL,
-        CreatedDate = images.CreatedDate,
-        UserId = images.UserId,
-        Comments = images.Comments.Select(c => new CommentDto
-        {
-            CommentId = c.CommentId,
-           Content = c.Content,
-           // CreatedAt = c.CreatedAt,
-            UserID = c.UserId
-        }).ToList()
-    };
-
-    return Ok(imageDto);
-}
 
     // PUT: api/image/{id}
     // Updates an existing image

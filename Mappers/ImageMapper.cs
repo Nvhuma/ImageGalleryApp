@@ -14,12 +14,12 @@ namespace api.Mappers
             return new ImageDto
             {
                 ImageId = ImageModel.ImageId,
-              UserId = ImageModel.UserId,
+                UserId = ImageModel.UserId,
                 Title = ImageModel.Title,
                 Description = ImageModel.Description,
                 CreatedDate = ImageModel.CreatedDate,
                 ImageURL = ImageModel.ImageURL,
-                 //AppUser = ImageModel. AppUser,
+               
 
 
                 Comments = ImageModel.Comments.Select(c => c.ToCommentDto()).ToList()

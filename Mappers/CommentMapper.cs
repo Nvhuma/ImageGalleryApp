@@ -13,16 +13,17 @@ namespace api.Mappers
     {
         public static CommentDto ToCommentDto(this Comment commentModel)
         {
-            return new CommentDto
-            {
-                CommentId = commentModel.CommentId,
-                Content = commentModel.Content,
-                CreatedDate = commentModel.CreatedDate,
-                ImageId = commentModel.ImageId,
-                //UserID = commentModel.UserId, 
-                CreatedBy = commentModel.AppUser.UserName,
+              if (commentModel == null) return null; // Handle null commentModel
 
-            };
+    return new CommentDto
+    {
+        CommentId = commentModel.CommentId,
+        Content = commentModel.Content,
+        CreatedDate = commentModel.CreatedDate,
+        ImageId = commentModel.ImageId,
+        UserID = commentModel.UserId,
+        CreatedBy = commentModel.AppUser?.UserName ?? "Unknown" // Handle potential null
+    };
         }
 
         public static Comment ToCommentFromCreate(this CreateCommentDto commentDto, int ImageId)

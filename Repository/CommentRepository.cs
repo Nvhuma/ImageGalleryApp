@@ -47,10 +47,6 @@ namespace api.Repository
         }
 
 
-        // public async Task<Comment?> GetByIdAsync( id)
-        // {
-        //     return await _context.Comments.Include(a => a.AppUser).FirstOrDefaultAsync(c => c.UserId == id);
-        // }
 
         public async Task<Comment?> GetByIdAsync(int id)
         {
@@ -80,7 +76,19 @@ namespace api.Repository
 
             return existingComment;
         }
+
+
+
+     public async Task<List<Comment>> GetCommentsByImageIdAsync(int imageId)
+        {
+           return await _context.Comments
+           .Include(c =>c.AppUser)
+                         .Where(c => c.ImageId == imageId)
+                         .ToListAsync();
+        }
     }
 
 
 }
+
+

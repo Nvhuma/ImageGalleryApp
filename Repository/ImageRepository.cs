@@ -106,7 +106,8 @@ namespace api.Repository
                     Description = image.Description,
                     ImageURL = image.ImageURL, // Include ImageURL in the projection
                     CreatedDate = image.CreatedDate,
-                    UserId = image.UserId // Include other properties as needed
+                    UserId = image.UserId, // Include other properties as needed
+                    Comments = image.Comments
                 })
                 .ToListAsync();
 
@@ -174,6 +175,7 @@ namespace api.Repository
 
             existingImage.ImageId = imageDto.ImageId;
             existingImage.Title = imageDto.Title;
+            existingImage.Description = imageDto.Description;
             existingImage.ImageURL = imageDto.ImageURL;
 
             await _context.SaveChangesAsync();
