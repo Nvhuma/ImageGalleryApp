@@ -46,23 +46,22 @@ namespace api.Repository
         public async Task<List<ImageTag>> GetAllAsync(QueryObject query)
 
         {
-            // Create a queryable list of image tags from the database.
+            // Creates a queryable list of image tags from the database.
             var imageTags = _context.ImageTags.AsQueryable();
 
-            // Check if the query's ImageId is not null and not the default value (0).
+            // Checks if the query's ImageId is not null and not the default value (0).
             if (!IsNullOrDefault(query.ImageTagID))
             {
-                // If ImageId is valid, filter the image tags to include only those with the specified ImageId.
+              
                 imageTags = imageTags.Where(it => it.ImageId == query.ImageTagID);
             }
-            // Convert the filtered queryable list to a List<ImageTag> and return it asynchronously.
+           
             return await imageTags.ToListAsync();
         }
 
         private bool IsNullOrDefault(int? ImageTagID)
         {
-            // Check if the nullable integer 'imageId' is either null or the default value (0).
-            // Return true if it is null or 0, otherwise return false.
+            
             return !ImageTagID.HasValue || ImageTagID.Value == default(int);
         }
 

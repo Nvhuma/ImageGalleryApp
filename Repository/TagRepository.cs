@@ -74,7 +74,7 @@ namespace api.Repository
                 return null;
             }
 
-            // Update the tag fields
+            
             existingTag.TagId = tagDto.TagId; // Ensuring  this field exists in both the entity and DTO
             existingTag.TagName = tagDto.TagName; // Update other fields as necessary if they arise 
 

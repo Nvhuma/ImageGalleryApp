@@ -114,54 +114,6 @@ public class EmailService : IEmailService
         throw new NotImplementedException();
     }
 
-    /// <summary>
-    /// Sends an email with the specified subject and message to the provided recipient.
-    /// </summary>
-    /// <param name="toEmail">The recipient's email address.</param>
-    /// <param name="subject">The subject of the email.</param>
-    /// <param name="message">The message body of the email.</param>
-    /// <returns>A task representing the asynchronous operation, with a boolean result indicating success or failure.</returns>
-    // public async Task<bool> SendEmailAsync(string toEmail, string subject, string message)
-    // {
-    //     try
-    //     {
-    //         // Create the email message
-    //         var mailMessage = new MailMessage
-    //         {
-    //             From = new MailAddress(_fromAddress, _fromName),
-    //             Subject = subject,
-    //             Body = message,
-    //             IsBodyHtml = true
-    //         };
-    //         mailMessage.To.Add(toEmail);
-
-    //         // Send the email asynchronously
-    //         await _smtpClient.SendMailAsync(mailMessage);
-    //         return true;
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         // Log the exception (logging service could be injected similarly to configuration)
-    //         _logger.LogError(ex, $"Error sending email: {ex.Message}");
-    //         return false;
-    //     }
-    // }
-
-    // /// <summary>
-    // /// Sends a password reset email with a reset link to the specified recipient.
-    // /// </summary>
-    // /// <param name="toEmail">The recipient's email address.</param>
-    // /// <param name="resetLink">The password reset link to be included in the email.</param>
-    // /// <returns>A task representing the asynchronous operation, with a boolean result indicating success or failure.</returns>
-    // public async Task<bool> SendPasswordResetEmailAsync(string toEmail, string resetLink)
-    // {
-    //     // Customize the subject and message for the password reset email
-    //     string subject = "Password Reset";
-    //     string message = $"To reset your password, please click the following link: {resetLink}";
-
-    //     // Use the SendEmailAsync method to send the email
-    //     return await SendEmailAsync(toEmail, subject, message);
-    // }
-
+   
 
 }

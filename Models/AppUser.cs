@@ -6,19 +6,19 @@ using Microsoft.AspNetCore.Identity;
 
 namespace api.Models
 {
-    public class AppUser : IdentityUser
-    {
-        public string ? Names { get; set;}
+	public class AppUser : IdentityUser
+	{
+		public string? Names { get; set; }
 
-        
-         public string TotpSecret { get; set; }
 
-       // public DateTime CreatedDate {get; set;} = DateTime.Now;
+		public string TotpSecret { get; set; }
 
-        public List<Image> Images { get; set;} = new List<Image>();
 
-        public List<Comment> Comments {get; set;} = new List<Comment>();
 
-        public List<UserPasswordHistory> UserPasswordHistories  { get; set; } = new List<UserPasswordHistory>();
-    }
+		public List<Image> Images { get; set; } = new List<Image>();
+
+		public List<Comment> Comments { get; set; } = new List<Comment>();
+
+		public List<UserPasswordHistory> UserPasswordHistories { get; set; } = new List<UserPasswordHistory>();
+	}
 }

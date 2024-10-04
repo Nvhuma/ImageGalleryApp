@@ -9,7 +9,7 @@ namespace api.Dtos.Tag
     public class CreateTagRequestDto
     {
         
-        // public int TagId { get; set; }
+        
         [Required]
         [MinLength(5, ErrorMessage = "Content must be 5 characters")]
         [MaxLength(1570, ErrorMessage = "Content cannot be over 280 characters")]

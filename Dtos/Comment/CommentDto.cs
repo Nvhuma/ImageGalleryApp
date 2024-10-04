@@ -15,7 +15,7 @@ namespace api.Dtos.ImageDto.Comments
 
         public string UserID {get; set;}
 
-       // public string ? UserID {get; set;}
+       
         public DateTime CreatedDate { get; set; } =   DateTime.Now;
     }
 }
