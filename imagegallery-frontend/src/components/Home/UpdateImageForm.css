@@ -1,0 +1,83 @@
+/* Styles for centering the form and styling input fields */
+.update-image-form {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	margin-top: 50px;
+  }
+  
+  .update-image-form form {
+	width: 800px; /* Increased width */
+	padding: 30px; 
+	border-radius: 10px;
+	background-color: #f3f3f3;
+	box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .update-image-form h3 {
+	text-align: center;
+	margin-bottom: 25px; /* Slightly larger margin */
+	font-size: 24px; /* Larger font size for heading */
+	color: #333;
+  }
+  
+  .update-image-form div {
+	margin-bottom: 20px; /* Increased space between form fields */
+  }
+  
+  .update-image-form label {
+	display: block;
+	margin-bottom: 8px; /* Increased spacing between label and input */
+	font-weight: bold;
+	font-size: 16px; /* Larger font size for labels */
+  }
+  
+  .update-image-form input[type="text"],
+  .update-image-form textarea {
+	width: 100%;
+	padding: 15px; /* Increased padding for input fields */
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	font-size: 16px; /* Larger font size for input text */
+	box-sizing: border-box;
+	background-color: #fff;
+	outline: none;
+	transition: border 0.3s ease;
+  }
+  
+  .update-image-form input[type="text"]:focus,
+  .update-image-form textarea:focus {
+	border: 1px solid #007bff;
+  }
+  
+  .update-image-form textarea {
+	height: 120px; /* Increased height for the textarea */
+	resize: none;
+  }
+  
+  /* Styles for buttons */
+  .update-image-form button {
+	width: 100%;
+	padding: 15px; /* Increased button padding */
+	border: none;
+	border-radius: 5px;
+	font-size: 18px; /* Larger font size for buttons */
+	cursor: pointer;
+	margin-bottom: 10px;
+  }
+  
+  .update-image-form button[type="submit"] {
+	background-color: #28a745;
+	color: white;
+  }
+  
+  .update-image-form button[type="button"] {
+	background-color: #dc3545;
+	color: white;
+  }
+  
+  .update-image-form button:hover {
+	opacity: 0.9;
+  }
+  

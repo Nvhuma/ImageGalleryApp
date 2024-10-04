@@ -1,0 +1,202 @@
+/* General reset and font settings */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins';
+}
+
+body {
+    background-color: #f5f5f5;
+    font-family: 'Poppins';
+}
+
+
+.image-upload-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar styles */
+.image-upload-sidebar {
+    width: 390px;
+     background-color: #2187AB;
+     display: flex;
+     flex-direction: column;
+     justify-content: space-between;
+     padding: 20px 0;
+}
+
+/* Logo section in the sidebar */
+.image-upload-logo-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.image-upload-logo-img {
+    width: 100%; 
+}
+
+/* Sidebar menu section */
+.image-upload-menu {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 0; 
+    margin-top: -610px;
+}
+
+.image-upload-menu-item,
+.image-upload-logout {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    color: white;
+    cursor: pointer;
+}
+
+.image-upload-menu-item.active,
+.image-upload-menu-item:hover,
+.image-upload-logout:hover {
+    background-color: rgba(255, 255, 255, 0.2); 
+}
+
+.image-upload-menu-item span,
+.image-upload-logout span {
+    margin-left: 10px;
+    font-size: 18px;
+}
+
+
+.image-upload-content {
+    flex-grow: 1;
+    padding: 40px;
+    background-color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 200px; 
+}
+
+
+.image-upload-header .nav {
+    display: flex;
+    align-items: center;
+}
+
+.image-upload-header .nav-item {
+    margin-left: 20px;
+    font-size: 16px;
+    color: #333;
+    text-decoration: none;
+    
+}
+
+.image-upload-header .nav-item:hover {
+    text-decoration: underline;
+}
+
+.image-upload-header .user {
+    display: flex;
+    align-items: center;
+}
+
+.image-upload-header .user img {
+    height: 40px;
+    border-radius: 50%;
+    margin-left: 10px;
+}
+
+/* Form container styles */
+.image-upload-form-container {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 700px;
+    max-width: 800px; 
+}
+
+.image-upload-form-container h2 {
+    margin-bottom: 30px;
+    font-size: 28px; /* Larger title font size */
+    color: #104fa1;
+}
+
+/* Form elements styling */
+.image-upload-form {
+    width: 100%;
+}
+
+.image-upload-form input,
+.image-upload-form textarea {
+    width: 100%;
+    padding: 15px; 
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.image-upload-form input:focus,
+.image-upload-form textarea:focus {
+    border-color: #104fa1;
+    outline: none;
+}
+
+/* Dropzone styles */
+.image-upload-dropzone {
+    width: 100%;
+    padding: 30px; 
+    border: 2px dashed #104fa1;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    text-align: center;
+    cursor: pointer;
+    margin-bottom: 30px;
+}
+
+.image-upload-dropzone:hover {
+    background-color: #e6f7ff;
+}
+
+/* Button styling */
+.image-upload-button,
+.image-upload-submit-button {
+    background-color: #104fa1;
+    color: white;
+    border: none;
+    padding: 15px 20px; 
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.image-upload-button:hover,
+.image-upload-submit-button:hover {
+    background-color: #083a76;
+}
+
+.image-upload-submit-button {
+    background-color: #2187AB;
+}
+
+.image-upload-submit-button:hover {
+    background-color: #1a5e7a;
+}
+.image-upload-success {
+    background-color: #d4edda;
+    color: #169c35;
+    border: 1px solid #c3e6cb;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+  }
+  

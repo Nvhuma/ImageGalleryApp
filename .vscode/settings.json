@@ -1,0 +1,13 @@
+{
+	"files.autoSave": "afterDelay",
+	"editor.tabSize": 2,
+	"editor.detectIndentation": false,
+	"omnisharp.organizeImportsOnFormat": true,
+	"git.branchSortOrder": "alphabetically",
+	"editor.formatOnSave": true,
+	"[csharp]": {
+	  "editor.maxTokenizationLineLength": 2500,
+	  "prettier.tabWidth": 2,
+	},
+	"csharp.format.enable": true,
+  }
